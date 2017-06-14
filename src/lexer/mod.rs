@@ -926,6 +926,7 @@ mod test {
         // Octal
         assert_lex("0", vec![Ok((0, Token::IntegerLiteral(0), 1))]);
         assert_lex("0624", vec![Ok((0, Token::IntegerLiteral(0o624), 4))]);
+        assert_lex("-0624", vec![Ok((0, Token::IntegerLiteral(-0o624), 5))]);
     }
 
     #[test]
