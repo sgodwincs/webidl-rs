@@ -15,6 +15,6 @@
 //! Contains a lexer for lexing the WebIDL grammar.
 
 /// Contains lexer related structures and functions for lexing the WebIDL grammar.
-pub mod lexer;
+mod lexer;
 
-pub use lexer::Lexer;
+pub use lexer::*;

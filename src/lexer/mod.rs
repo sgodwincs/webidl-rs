@@ -106,8 +106,7 @@ fn create_error(code: LexicalErrorCode, location: usize) -> LexicalError {
 /// directly from a string taken from a file.
 ///
 /// ```
-/// use webidl_parser::Lexer;
-/// use webidl_parser::lexer::Token;
+/// use webidl_parser::*;
 ///
 /// let lexer = Lexer::new("/* Example taken from emscripten site */\n\
 ///                         enum EnumClass_EnumWithinClass {\n\
@@ -158,7 +157,7 @@ fn create_error(code: LexicalErrorCode, location: usize) -> LexicalError {
 /// to get tokens even if a lexical error occurs. For example:
 ///
 /// ```
-/// use webidl_parser::lexer::*;
+/// use webidl_parser::*;
 ///
 /// let lexer = Lexer::new("identifier = 0xG");
 /// assert_eq!(lexer.collect::<Vec<_>>(),
@@ -199,7 +198,7 @@ impl<'input> Lexer<'input> {
     /// finite state machine that matches over characters of the input. For the sake of readability,
     /// a lot of the lexing has been abstracted into separate functions.
     ///
-    /// # Return
+    /// # Return Value
     ///
     /// The return value is an `Option`, with a value of `None` signifying EOF, whereas `Some` is
     /// a value of type `Spanned`.
