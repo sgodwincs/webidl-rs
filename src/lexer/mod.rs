@@ -95,7 +95,85 @@ fn create_error(code: LexicalErrorCode, location: usize) -> LexicalError {
     }
 }
 
-/// The lexer that is used to perform lexical analysis on the WebIDL grammar.
+/// The lexer that is used to perform lexical analysis on the WebIDL grammar. The lexer implements
+/// the `Iterator` trait, so in order to retrieve the tokens, you simply have to iterate over it.
+///
+///
+/// # Example
+///
+/// The following example shows how a string can be lexed into a `Vec<(usize, Token, usize)>`. Note
+/// that since `\` is used to do multilines in this example, the locations may vary if you lex
+/// directly from a string taken from a file.
+///
+/// ```
+/// use webidl_parser::Lexer;
+/// use webidl_parser::lexer::Token;
+///
+/// let lexer = Lexer::new("/* Example taken from emscripten site */\n\
+///                         enum EnumClass_EnumWithinClass {\n\
+///                             \"EnumClass::e_val\"\n\
+///                         };\n\
+///                         // This is a comment.\n\
+///                         interface EnumClass {\n\
+///                             void EnumClass();\n\
+///
+///                             EnumClass_EnumWithinClass GetEnum();\n\
+///
+///                             EnumNamespace_EnumInNamespace GetEnumFromNameSpace();\n\
+///                         };");
+/// assert_eq!(lexer.collect::<Vec<_>>(),
+///            vec![Ok((41, Token::Enum, 45)),
+///                 Ok((46, Token::Identifier("EnumClass_EnumWithinClass".to_string()), 71)),
+///                 Ok((72, Token::LeftBrace, 73)),
+///                 Ok((74, Token::StringLiteral("EnumClass::e_val".to_string()), 92)),
+///                 Ok((93, Token::RightBrace, 94)),
+///                 Ok((94, Token::Semicolon, 95)),
+///                 Ok((118, Token::Interface, 127)),
+///                 Ok((128, Token::Identifier("EnumClass".to_string()), 137)),
+///                 Ok((138, Token::LeftBrace, 139)),
+///                 Ok((140, Token::Void, 144)),
+///                 Ok((145, Token::Identifier("EnumClass".to_string()), 154)),
+///                 Ok((154, Token::LeftParenthesis, 155)),
+///                 Ok((155, Token::RightParenthesis, 156)),
+///                 Ok((156, Token::Semicolon, 157)),
+///                 Ok((158, Token::Identifier("EnumClass_EnumWithinClass".to_string()), 183)),
+///                 Ok((184, Token::Identifier("GetEnum".to_string()), 191)),
+///                 Ok((191, Token::LeftParenthesis, 192)),
+///                 Ok((192, Token::RightParenthesis, 193)),
+///                 Ok((193, Token::Semicolon, 194)),
+///                 Ok((195,
+///                     Token::Identifier("EnumNamespace_EnumInNamespace".to_string()),
+///                     224)),
+///                 Ok((225, Token::Identifier("GetEnumFromNameSpace".to_string()), 245)),
+///                 Ok((245, Token::LeftParenthesis, 246)),
+///                 Ok((246, Token::RightParenthesis, 247)),
+///                 Ok((247, Token::Semicolon, 248)),
+///                 Ok((249, Token::RightBrace, 250)),
+///                 Ok((250, Token::Semicolon, 251))]);
+/// ```
+///
+/// # Errors
+///
+/// Because the lexer is implemented as an iterator over tokens, this means that you can continue
+/// to get tokens even if a lexical error occurs. For example:
+///
+/// ```
+/// use webidl_parser::lexer::*;
+///
+/// let lexer = Lexer::new("identifier = 0xG");
+/// assert_eq!(lexer.collect::<Vec<_>>(),
+///            vec![Ok((0, Token::Identifier("identifier".to_string()), 10)),
+///                 Ok((11, Token::Equals, 12)),
+///                 Err(LexicalError {
+///                         code: LexicalErrorCode::ExpectedHexadecimalDigit,
+///                         location: 15,
+///                     }),
+///                 Ok((15, Token::Identifier("G".to_string()), 16))]);
+///
+/// ```
+///
+/// Of course, what follows after an error may just compound into more errors.
+///
 #[derive(Clone, Debug)]
 pub struct Lexer<'input> {
     /// A peekable iterator of chars and their indices. This is created from the input string given
