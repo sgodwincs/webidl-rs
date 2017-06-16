@@ -718,8 +718,8 @@ impl<'input> Lexer<'input> {
         }
     }
 
-    /// Continues lexing negative infinity. The call assumption is that `-I` have already been
-    /// lexed.
+    /// Continues lexing negative infinity. The call assumption is that `-` has already been
+    /// lexed with the assumption that "I" follows.
     fn lex_negative_infinity(&mut self, start: usize) -> Option<<Self as Iterator>::Item> {
         let infinity = self.chars
             .clone()
@@ -728,7 +728,7 @@ impl<'input> Lexer<'input> {
             .collect::<String>();
 
         if infinity == "Infinity" {
-            for _ in 0..9 {
+            for _ in 0..8 {
                 self.chars.next();
             }
 
@@ -736,7 +736,7 @@ impl<'input> Lexer<'input> {
         } else {
             let char_count = infinity.chars().count();
 
-            for _ in char_count..9 {
+            for _ in char_count..8 {
                 self.chars.next();
             }
 
@@ -1017,7 +1017,9 @@ mod test {
 
     #[test]
     fn lex_negative_infinity() {
-        assert_lex("-Infinity", vec![Ok((0, Token::NegativeInfinity, 9))])
+        assert_lex("-Infinity", vec![Ok((0, Token::NegativeInfinity, 9))]);
+        assert_lex("-Infinity;",
+                   vec![Ok((0, Token::NegativeInfinity, 9)), Ok((9, Token::Semicolon, 10))]);
     }
 
     #[test]
