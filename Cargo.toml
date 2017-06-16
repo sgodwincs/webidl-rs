@@ -1,5 +1,6 @@
 [package]
 authors = ["Scott Godwin <sgodwincs@gmail.com>"]
+build = "build.rs"
 description = "A WebIDL parser"
 homepage = "https://github.com/sgodwincs/webidl-parser"
 license = "MIT"
@@ -8,8 +9,15 @@ readme = "README.md"
 repository = "https://github.com/sgodwincs/webidl-parser"
 version = "0.1.0"
 
+[build-dependencies]
+lalrpop = "0.13.0"
+
 [dependencies]
-clippy = {version = "*", optional = true}
+lalrpop-util = "0.13.0"
+
+[dependencies.clippy]
+optional = true
+version = "*"
 
 [features]
 default = []

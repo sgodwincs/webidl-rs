@@ -1,0 +1,187 @@
+use std::f64;
+
+use super::ast;
+use lexer::*;
+
+grammar;
+
+pub BooleanLiteral: bool = {
+    "false" => false,
+    "true" => true
+};
+
+pub Const: ast::Const = {
+    "const" <const_type: ConstType> <nullable: "?"?> <name: "Identifier"> "=" <value: ConstValue> ";" => {
+        ast::Const {
+            const_type: const_type,
+            name: name,
+            nullable: nullable.is_some(),
+            value: value
+        }
+    }
+};
+
+pub ConstType: ast::ConstType = {
+    "Identifier" => ast::ConstType::Identifier(<>),
+    "boolean" => ast::ConstType::Boolean,
+    "byte" => ast::ConstType::Byte,
+    "octet" => ast::ConstType::Octet,
+    ExtendedFloatType => ast::ConstType::ExtendedFloatType(<>),
+    ExtendedIntegerType => ast::ConstType::ExtendedIntegerType(<>)
+};
+
+pub ConstValue: ast::ConstValue = {
+    BooleanLiteral => ast::ConstValue::BooleanLiteral(<>),
+    FloatLiteral => ast::ConstValue::FloatLiteral(<>),
+    "IntegerLiteral" => ast::ConstValue::IntegerLiteral(<>),
+    "null" => ast::ConstValue::Null
+};
+
+pub ExtendedFloatType: ast::ExtendedFloatType = {
+    "unrestricted" <FloatType> => {
+        ast::ExtendedFloatType {
+            float_type: <>,
+            restricted: false
+        }
+    },
+    <FloatType> => {
+        ast::ExtendedFloatType {
+            float_type: <>,
+            restricted: true
+        }
+    }
+};
+
+pub ExtendedIntegerType: ast::ExtendedIntegerType = {
+    "unsigned" <IntegerType> => {
+        ast::ExtendedIntegerType {
+            integer_type: <>,
+            unsigned: true
+        }
+    },
+    <IntegerType> => {
+        ast::ExtendedIntegerType {
+            integer_type: <>,
+            unsigned: false
+        }
+    }
+};
+
+pub FloatLiteral: f64 = {
+    "FloatLiteral",
+    "-Infinity" => f64::NEG_INFINITY,
+    "Infinity" => f64::INFINITY,
+    "NaN" => f64::NAN
+};
+
+pub FloatType: ast::FloatType = {
+    "double" => ast::FloatType::Double,
+    "float" => ast::FloatType::Float
+};
+
+pub IntegerType: ast::IntegerType = {
+    "short" => ast::IntegerType::Short,
+    "long" <"long"?> => {
+        match <> {
+            Some(_) => ast::IntegerType::LongLong,
+            None => ast::IntegerType::Long
+        }
+    }
+};
+
+extern {
+    type Error = LexicalError;
+    type Location = usize;
+
+    enum Token {
+        // Keywords
+        "any" => Token::Any,
+        "ArrayBuffer" => Token::ArrayBuffer,
+        "attribute" => Token::Attribute,
+        "boolean" => Token::Boolean,
+        "byte" => Token::Byte,
+        "ByteString" => Token::ByteString,
+        "callback" => Token::Callback,
+        "const" => Token::Const,
+        "DataView" => Token::DataView,
+        "deleter" => Token::Deleter,
+        "dictionary" => Token::Dictionary,
+        "DOMException" => Token::DOMException,
+        "DOMString" => Token::DOMString,
+        "double" => Token::Double,
+        "enum" => Token::Enum,
+        "Error" => Token::Error,
+        "false" => Token::False,
+        "float" => Token::Float,
+        "Float32Array" => Token::Float32Array,
+        "Float64Array" => Token::Float64Array,
+        "FrozenArray" => Token::FrozenArray,
+        "getter" => Token::Getter,
+        "implements" => Token::Implements,
+        "inherit" => Token::Inherit,
+        "Int16Array" => Token::Int16Array,
+        "Int32Array" => Token::Int32Array,
+        "Int8Array" => Token::Int8Array,
+        "interface" => Token::Interface,
+        "iterable" => Token::Iterable,
+        "legacycaller" => Token::LegacyCaller,
+        "long" => Token::Long,
+        "maplike" => Token::Maplike,
+        "namespace" => Token::Namespace,
+        "NaN" => Token::NaN,
+        "-Infinity" => Token::NegativeInfinity,
+        "null" => Token::Null,
+        "object" => Token::Object,
+        "octet" => Token::Octet,
+        "optional" => Token::Optional,
+        "or" => Token::Or,
+        "partial" => Token::Partial,
+        "Infinity" => Token::PositiveInfinity,
+        "Promise" => Token::Promise,
+        "readonly" => Token::ReadOnly,
+        "record" => Token::Record,
+        "required" => Token::Required,
+        "sequence" => Token::Sequence,
+        "serializer" => Token::Serializer,
+        "setlike" => Token::Setlike,
+        "setter" => Token::Setter,
+        "short" => Token::Short,
+        "static" => Token::Static,
+        "stringifier" => Token::Stringifier,
+        "true" => Token::True,
+        "typedef" => Token::Typedef,
+        "USVString" => Token::USVString,
+        "Uint16Array" => Token::Uint16Array,
+        "Uint32Array" => Token::Uint32Array,
+        "Uint8Array" => Token::Uint8Array,
+        "Uint8ClampedArray" => Token::Uint8ClampedArray,
+        "unrestricted" => Token::Unrestricted,
+        "unsigned" => Token::Unsigned,
+        "void" => Token::Void,
+
+        // Regular expressions
+        "FloatLiteral" => Token::FloatLiteral(<f64>),
+        "Identifier" => Token::Identifier(<String>),
+        "IntegerLiteral" => Token::IntegerLiteral(<i64>),
+        "OtherLiteral" => Token::OtherLiteral(<char>),
+        "StringLiteral" => Token::StringLiteral(<String>),
+
+        // Symbols
+        ":" => Token::Colon,
+        "," => Token::Comma,
+        "..." => Token::Ellipsis,
+        "=" => Token::Equals,
+        ">" => Token::GreaterThan,
+        "-" => Token::Hyphen,
+        "{" => Token::LeftBrace,
+        "[" => Token::LeftBracket,
+        "(" => Token::LeftParenthesis,
+        "<" => Token::LessThan,
+        "." => Token::Period,
+        "?" => Token::QuestionMark,
+        "}" => Token::RightBrace,
+        "]" => Token::RightBracket,
+        ")" => Token::RightParenthesis,
+        ";" => Token::Semicolon,
+    }
+}
