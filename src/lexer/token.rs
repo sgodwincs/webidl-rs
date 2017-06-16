@@ -1,7 +1,7 @@
 /// An enum of all possible tokens allowed by the
 /// [WebIDL grammar](https://heycam.github.io/webidl/#idl-grammar) A token in this case is a
 /// terminal, either a static string or regular expression based token. Note that not all possible
-/// simplifications are made such as converting the "True" and "False" tokens to actual booleans.
+/// simplifications are made such as converting the `True` and `False` tokens to actual booleans.
 /// This choice was made to be as consistent as possible with the WebIDL grammar.
 #[allow(missing_docs)]
 #[derive(Clone, Debug, PartialEq)]
@@ -25,8 +25,8 @@ pub enum Token {
     Error,
     False,
     Float,
-    Float64Array,
     Float32Array,
+    Float64Array,
     FrozenArray,
     Getter,
     Implements,
