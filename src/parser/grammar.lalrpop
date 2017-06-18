@@ -1,92 +1,10 @@
-use std::f64;
-
-use super::ast;
 use lexer::*;
 
 grammar;
 
-pub BooleanLiteral: bool = {
-    "false" => false,
-    "true" => true
-};
-
-pub Const: ast::Const = {
-    "const" <const_type: ConstType> <nullable: "?"?> <name: "Identifier"> "=" <value: ConstValue> ";" => {
-        ast::Const {
-            const_type: const_type,
-            name: name,
-            nullable: nullable.is_some(),
-            value: value
-        }
-    }
-};
-
-pub ConstType: ast::ConstType = {
-    "Identifier" => ast::ConstType::Identifier(<>),
-    "boolean" => ast::ConstType::Boolean,
-    "byte" => ast::ConstType::Byte,
-    "octet" => ast::ConstType::Octet,
-    ExtendedFloatType => ast::ConstType::ExtendedFloatType(<>),
-    ExtendedIntegerType => ast::ConstType::ExtendedIntegerType(<>)
-};
-
-pub ConstValue: ast::ConstValue = {
-    BooleanLiteral => ast::ConstValue::BooleanLiteral(<>),
-    FloatLiteral => ast::ConstValue::FloatLiteral(<>),
-    "IntegerLiteral" => ast::ConstValue::IntegerLiteral(<>),
-    "null" => ast::ConstValue::Null
-};
-
-pub ExtendedFloatType: ast::ExtendedFloatType = {
-    "unrestricted" <FloatType> => {
-        ast::ExtendedFloatType {
-            float_type: <>,
-            restricted: false
-        }
-    },
-    <FloatType> => {
-        ast::ExtendedFloatType {
-            float_type: <>,
-            restricted: true
-        }
-    }
-};
-
-pub ExtendedIntegerType: ast::ExtendedIntegerType = {
-    "unsigned" <IntegerType> => {
-        ast::ExtendedIntegerType {
-            integer_type: <>,
-            unsigned: true
-        }
-    },
-    <IntegerType> => {
-        ast::ExtendedIntegerType {
-            integer_type: <>,
-            unsigned: false
-        }
-    }
-};
-
-pub FloatLiteral: f64 = {
-    "FloatLiteral",
-    "-Infinity" => f64::NEG_INFINITY,
-    "Infinity" => f64::INFINITY,
-    "NaN" => f64::NAN
-};
-
-pub FloatType: ast::FloatType = {
-    "double" => ast::FloatType::Double,
-    "float" => ast::FloatType::Float
-};
-
-pub IntegerType: ast::IntegerType = {
-    "short" => ast::IntegerType::Short,
-    "long" <"long"?> => {
-        match <> {
-            Some(_) => ast::IntegerType::LongLong,
-            None => ast::IntegerType::Long
-        }
-    }
+// placeholder
+pub Num: i32 = {
+    "void" => 0
 };
 
 extern {
