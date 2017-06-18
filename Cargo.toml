@@ -10,10 +10,10 @@ repository = "https://github.com/sgodwincs/webidl-parser"
 version = "0.1.0"
 
 [build-dependencies]
-lalrpop = "0.13.0"
+lalrpop = "0.13.1"
 
 [dependencies]
-lalrpop-util = "0.13.0"
+lalrpop-util = "0.13.1"
 
 [dependencies.clippy]
 optional = true
