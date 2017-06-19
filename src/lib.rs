@@ -13,6 +13,8 @@
 
 //! Contains a lexer for lexing the WebIDL grammar.
 
+extern crate lalrpop_util;
+
 /// Contains lexer related structures and functions for lexing the WebIDL grammar.
 mod lexer;
 
