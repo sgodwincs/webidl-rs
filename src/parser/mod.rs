@@ -28,6 +28,7 @@ impl Parser {
     /// use webidl_parser::ast::*;
     ///
     /// let result = Parser::parse_string("[Attribute] interface Node { };");
+    ///
     /// assert_eq!(result,
     ///            Ok(vec![Definition {
     ///                 definition_type: DefinitionType::Interface(Interface {
