@@ -17,7 +17,7 @@ lalrpop-util = "0.13.1"
 
 [dependencies.clippy]
 optional = true
-version = "*"
+version = "0.0.140"
 
 [features]
 default = []
