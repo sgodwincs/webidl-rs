@@ -1,10 +1,1001 @@
+use std::f64;
+
+use super::ast;
 use lexer::*;
 
 grammar;
 
-// placeholder
-pub Num: i32 = {
-    "void" => 0
+Argument: ast::Argument = {
+    <extended_attributes: ExtendedAttributeList> "optional"
+    <type_: TypeWithExtendedAttributes> <name: ArgumentName> <default: Default> => {
+        ast::Argument::Optional(ast::OptionalArgument { <> })
+    },
+    <extended_attributes: ExtendedAttributeList> <type_: Type>
+    <variadic: Ellipsis> <name: ArgumentName> => {
+        ast::Argument::NonOptional(ast::NonOptionalArgument { <> })
+    }
+};
+
+ArgumentList: Vec<ast::Argument> = {
+    (<Argument> <Arguments>)? => {
+        match <> {
+            Some((argument, arguments)) => {
+                let mut arguments = arguments;
+                arguments.insert(0, argument);
+                arguments
+            }
+            None => vec![]
+        }
+    }
+};
+
+ArgumentName: ast::ArgumentName = {
+    ArgumentNameKeyword => ast::ArgumentName::Keyword(<>),
+    "Identifier" => ast::ArgumentName::Identifier(<>)
+};
+
+ArgumentNameKeyword: ast::ArgumentNameKeyword = {
+    "attribute" => ast::ArgumentNameKeyword::Attribute,
+    "callback" => ast::ArgumentNameKeyword::Callback,
+    "const" => ast::ArgumentNameKeyword::Const,
+    "deleter" => ast::ArgumentNameKeyword::Deleter,
+    "dictionary" => ast::ArgumentNameKeyword::Dictionary,
+    "enum" => ast::ArgumentNameKeyword::Enum,
+    "getter" => ast::ArgumentNameKeyword::Getter,
+    "implements" => ast::ArgumentNameKeyword::Implements,
+    "inherit" => ast::ArgumentNameKeyword::Inherit,
+    "interface" => ast::ArgumentNameKeyword::Interface,
+    "iterable" => ast::ArgumentNameKeyword::Iterable,
+    "legacycaller" => ast::ArgumentNameKeyword::LegacyCaller,
+    "maplike" => ast::ArgumentNameKeyword::Maplike,
+    "namespace" => ast::ArgumentNameKeyword::Namespace,
+    "partial" => ast::ArgumentNameKeyword::Partial,
+    "serializer" => ast::ArgumentNameKeyword::Serializer,
+    "setlike" => ast::ArgumentNameKeyword::Setlike,
+    "setter" => ast::ArgumentNameKeyword::Setter,
+    "static" => ast::ArgumentNameKeyword::Static,
+    "stringifier" => ast::ArgumentNameKeyword::Stringifier,
+    "typedef" => ast::ArgumentNameKeyword::Typedef,
+    "unrestricted" => ast::ArgumentNameKeyword::Unrestricted
+};
+
+Arguments: Vec<ast::Argument> = {
+    ("," <Argument> <Arguments>)? => {
+        match <> {
+            Some((argument, arguments)) => {
+                let mut arguments = arguments;
+                arguments.insert(0, argument);
+                arguments
+            }
+            None => vec![]
+        }
+    }
+};
+
+AttributeName: ast::AttributeName = {
+    AttributeNameKeyword => ast::AttributeName::Required,
+    "Identifier" => ast::AttributeName::Identifier(<>)
+};
+
+AttributeNameKeyword: () = {
+    "required"
+};
+
+AttributeRest: (ast::AttributeName, Box<ast::TypeWithExtendedAttributes>) = {
+    "attribute" <type_: TypeWithExtendedAttributes> <name: AttributeName> ";" => (name, type_)
+};
+
+BooleanLiteral: bool = {
+    "false" => false,
+    "true" => true
+};
+
+BufferRelatedType: ast::BufferRelatedType = {
+    "ArrayBuffer" => ast::BufferRelatedType::ArrayBuffer,
+    "DataView" => ast::BufferRelatedType::DataView,
+    "Int16Array" => ast::BufferRelatedType::Int16Array,
+    "Int32Array" => ast::BufferRelatedType::Int32Array,
+    "Int8Array" => ast::BufferRelatedType::Int8Array,
+    "Uint16Array" => ast::BufferRelatedType::Uint16Array,
+    "Uint32Array" => ast::BufferRelatedType::Uint32Array,
+    "Uint8Array" => ast::BufferRelatedType::Uint8Array,
+    "Uint8ClampedArray" => ast::BufferRelatedType::Uint8ClampedArray,
+    "Float32Array" => ast::BufferRelatedType::Float32Array,
+    "Float64Array" => ast::BufferRelatedType::Float64Array,
+};
+
+CallbackOrInterface: ast::DefinitionType = {
+    "callback" <CallbackRestOrInterface>,
+    Interface => {
+        ast::DefinitionType::Interface(ast::Interface {
+            members: <>.0,
+            name: <>.1,
+            type_: ast::InterfaceType::NonPartial(<>.2)
+        })
+    }
+};
+
+CallbackRest: ast::Callback = {
+    <name: "Identifier"> "=" <return_type: ReturnType> "(" <arguments: ArgumentList> ")" ";" => {
+        ast::Callback { <> }
+    }
+};
+
+CallbackRestOrInterface: ast::DefinitionType = {
+    CallbackRest => ast::DefinitionType::Callback(<>),
+    Interface => {
+        ast::DefinitionType::Interface(ast::Interface {
+            members: <>.0,
+            name: <>.1,
+            type_: ast::InterfaceType::Callback(<>.2)
+        })
+    }
+};
+
+Const: ast::Const = {
+    "const" <type_: ConstType> <name: "Identifier"> "=" <value: ConstValue> ";" => {
+        ast::Const { <> }
+    }
+};
+
+ConstType: ast::ConstType = {
+    <type_: PrimitiveType> <nullable: Null> => {
+        ast::ConstType::PrimitiveType(ast::Nullable { <> })
+    },
+    <type_: "Identifier"> <nullable: Null> => {
+        ast::ConstType::Identifier(ast::Nullable { <> })
+    }
+};
+
+ConstValue: ast::ConstValue = {
+    BooleanLiteral => ast::ConstValue::BooleanLiteral(<>),
+    FloatLiteral => ast::ConstValue::FloatLiteral(<>),
+    "IntegerLiteral" => ast::ConstValue::IntegerLiteral(<>),
+    "null" => ast::ConstValue::Null
+};
+
+Default: Option<ast::DefaultValue> = {
+    ("=" <DefaultValue>)?
+};
+
+DefaultValue: ast::DefaultValue = {
+    ConstValue => ast::DefaultValue::ConstValue(<>),
+    "StringLiteral" => ast::DefaultValue::StringLiteral(<>),
+    "[" "]" => ast::DefaultValue::EmptySequence
+};
+
+Definition: ast::Definition = {
+    <extended_attributes: ExtendedAttributeList> <definition_type: DefinitionType> => {
+        ast::Definition { <> }
+    }
+};
+
+DefinitionType: ast::DefinitionType = {
+    CallbackOrInterface,
+    Namespace => {
+        ast::DefinitionType::Namespace(ast::Namespace {
+            members: <>.0,
+            name: <>.1,
+            partial: false
+        })
+    },
+    Partial,
+    Enum => ast::DefinitionType::Enum(<>),
+    Dictionary => ast::DefinitionType::Dictionary(<>),
+    Typedef => ast::DefinitionType::Typedef(<>),
+    Implements => ast::DefinitionType::Implements(<>),
+};
+
+pub Definitions: Vec<ast::Definition> = {
+    Definition*
+};
+
+Dictionary: ast::Dictionary = {
+    "dictionary" <name: "Identifier"> <inheritance: Inheritance>
+    "{" <members: DictionaryMembers> "}" ";" => {
+        ast::Dictionary {
+            members: members,
+            name: name,
+            type_: ast::DictionaryType::NonPartial(inheritance)
+        }
+    }
+};
+
+DictionaryMember: ast::DictionaryMember = {
+    <extended_attributes: ExtendedAttributeList> "required"
+    <type_: TypeWithExtendedAttributes> <name: "Identifier"> <default: Default> ";" => {
+        ast::DictionaryMember::Required(ast::RequiredDictionaryMember { <> })
+    },
+    <extended_attributes: ExtendedAttributeList> <type_: Type>
+    <name: "Identifier"> <default: Default> ";" => {
+        ast::DictionaryMember::NonRequired(ast::NonRequiredDictionaryMember { <> })
+    }
+};
+
+DictionaryMembers: Vec<ast::DictionaryMember> = {
+    (<DictionaryMember> <DictionaryMembers>)? => {
+        match <> {
+            Some((member, members)) => {
+                let mut members = members;
+                members.insert(0, member);
+                members
+            }
+            None => vec![]
+        }
+    }
+};
+
+Ellipsis: bool = {
+    "..."? => <>.is_some()
+};
+
+Enum: ast::Enum = {
+    "enum" <name: "Identifier"> "{" <variants: EnumValueList> "}" ";" => {
+        ast::Enum { <> }
+    }
+};
+
+EnumValueList: Vec<String> = {
+    <variant: "StringLiteral"> <variants: EnumValueListComma> => {
+        let mut variants = variants;
+        variants.insert(0, variant);
+        variants
+    }
+};
+
+EnumValueListComma: Vec<String> = {
+    ("," <EnumValueListString>)? => {
+        match <> {
+            Some(variants) => variants,
+            None => vec![]
+        }
+    }
+};
+
+EnumValueListString: Vec<String> = {
+    (<"StringLiteral"> <EnumValueListComma>)? => {
+        match <> {
+            Some((variant, variants)) => {
+                let mut variants = variants;
+                variants.insert(0, variant);
+                variants
+            }
+            None => vec![]
+        }
+    }
+};
+
+ExtendedAttribute: Box<ast::ExtendedAttribute> = {
+    "(" <inner: ExtendedAttributeInner> ")" <rest: ExtendedAttributeRest> => {
+        Box::new(ast::ExtendedAttribute::Nested {
+            group_type: ast::ExtendedAttributeGroupType::Parenthesis,
+            inner: inner,
+            rest: rest
+        })
+    },
+    "[" <inner: ExtendedAttributeInner> "]" <rest: ExtendedAttributeRest> => {
+        Box::new(ast::ExtendedAttribute::Nested {
+            group_type: ast::ExtendedAttributeGroupType::Bracket,
+            inner: inner,
+            rest: rest
+        })
+    },
+    "{" <inner: ExtendedAttributeInner> "}" <rest: ExtendedAttributeRest> => {
+        Box::new(ast::ExtendedAttribute::Nested {
+            group_type: ast::ExtendedAttributeGroupType::Brace,
+            inner: inner,
+            rest: rest
+        })
+    },
+    <other: Other> <rest: ExtendedAttributeRest> => {
+        Box::new(ast::ExtendedAttribute::Other {
+            other: other,
+            rest: rest
+        })
+    }
+};
+
+ExtendedAttributeArgList: ast::ExtendedAttributePattern = {
+    <name: "Identifier"> "(" <arguments: ArgumentList> ")" => {
+        ast::ExtendedAttributePattern::ArgList(name, arguments)
+    }
+};
+
+ExtendedAttributeIdentifier: ast::ExtendedAttributePattern = {
+    <lhs: "Identifier"> "=" <rhs: "Identifier"> => {
+        ast::ExtendedAttributePattern::Identifier(lhs, rhs)
+    }
+};
+
+ExtendedAttributeIdentifierList: ast::ExtendedAttributePattern = {
+    <name: "Identifier"> "=" "(" <identifiers: IdentifierList> ")" => {
+        ast::ExtendedAttributePattern::IdentifierList(name, identifiers)
+    }
+};
+
+ExtendedAttributeInner: Option<Box<ast::ExtendedAttributeInner>> = {
+    "(" <inner: ExtendedAttributeInner> ")" <rest: ExtendedAttributeInner> => {
+        Some(Box::new(ast::ExtendedAttributeInner::Nested {
+            group_type: ast::ExtendedAttributeGroupType::Parenthesis,
+            inner: inner,
+            rest: rest
+        }))
+    },
+    "[" <inner: ExtendedAttributeInner> "]" <rest: ExtendedAttributeInner> => {
+        Some(Box::new(ast::ExtendedAttributeInner::Nested {
+            group_type: ast::ExtendedAttributeGroupType::Bracket,
+            inner: inner,
+            rest: rest
+        }))
+    },
+    "{" <inner: ExtendedAttributeInner> "}" <rest: ExtendedAttributeInner> => {
+        Some(Box::new(ast::ExtendedAttributeInner::Nested {
+            group_type: ast::ExtendedAttributeGroupType::Brace,
+            inner: inner,
+            rest: rest
+        }))
+    },
+    <other: OtherOrComma> <inner: ExtendedAttributeInner> => {
+        Some(Box::new(ast::ExtendedAttributeInner::Other {
+            inner: inner,
+            other: other
+        }))
+    },
+    () => None
+};
+
+ExtendedAttributeList: Vec<Box<ast::ExtendedAttribute>> = {
+    ("[" <ExtendedAttribute> <ExtendedAttributes> "]")? => {
+        match <> {
+            Some((extended_attribute, extended_attributes)) => {
+                let mut extended_attributes = extended_attributes;
+                extended_attributes.insert(0, extended_attribute);
+                extended_attributes
+            }
+            None => vec![]
+        }
+    }
+};
+
+ExtendedAttributeNamedArgList: ast::ExtendedAttributePattern = {
+    <lhs_identifier: "Identifier"> "=" <rhs_identifier: "Identifier">
+    "(" <arguments: ArgumentList> ")" => {
+        ast::ExtendedAttributePattern::NamedArgList(lhs_identifier, rhs_identifier, arguments)
+    }
+};
+
+ExtendedAttributeNoArgs: ast::ExtendedAttributePattern = {
+    "Identifier" => ast::ExtendedAttributePattern::NoArgs(<>)
+};
+
+ExtendedAttributeRest: Option<Box<ast::ExtendedAttribute>> = {
+    ExtendedAttribute?
+};
+
+ExtendedAttributes: Vec<Box<ast::ExtendedAttribute>> = {
+    ("," <ExtendedAttribute> <ExtendedAttributes>)? => {
+        match <> {
+            Some((extended_attribute, extended_attributes)) => {
+                let mut extended_attributes = extended_attributes;
+                extended_attributes.insert(0, extended_attribute);
+                extended_attributes
+            }
+            None => vec![]
+        }
+    }
+};
+
+FloatLiteral: f64 = {
+    "FloatLiteral",
+    "-Infinity" => f64::NEG_INFINITY,
+    "Infinity" => f64::INFINITY,
+    "NaN" => f64::NAN
+};
+
+FloatType: ast::FloatType = {
+    "double" => ast::FloatType::Double,
+    "float" => ast::FloatType::Float
+};
+
+IdentifierList: Vec<ast::Identifier> = {
+    <identifier: "Identifier"> <identifiers: Identifiers> => {
+        let mut identifiers = identifiers;
+        identifiers.insert(0, identifier);
+        identifiers
+    }
+};
+
+Identifiers: Vec<ast::Identifier> = {
+    ("," <"Identifier"> <Identifiers>)? => {
+        match <> {
+            Some((identifier, identifiers)) => {
+                let mut identifiers = identifiers;
+                identifiers.insert(0, identifier);
+                identifiers
+            }
+            None => vec![]
+        }
+    }
+};
+
+Implements: ast::Implements = {
+    <lhs: "Identifier"> "implements" <rhs: "Identifier"> ";" => {
+        ast::Implements { <> }
+    }
+};
+
+Inherit: bool = {
+    "inherit"? => <>.is_some()
+};
+
+Inheritance: Option<ast::Identifier> = {
+    (":" <"Identifier">)?
+};
+
+IntegerType: ast::IntegerType = {
+    "short" => ast::IntegerType::Short,
+    "long" <OptionalLong> => {
+        if <> {
+            ast::IntegerType::LongLong
+        } else {
+            ast::IntegerType::Long
+        }
+    }
+};
+
+Interface: (Vec<ast::InterfaceMember>, ast::Identifier, Option<ast::Identifier>) = {
+    "interface" <name: "Identifier"> <inheritance: Inheritance>
+    "{" <members: InterfaceMembers> "}" ";" => {
+        (members, name, inheritance)
+    }
+};
+
+InterfaceMember: ast::InterfaceMember = {
+    <extended_attributes: ExtendedAttributeList> <type_: InterfaceMemberType> => {
+        ast::InterfaceMember { <> }
+    }
+};
+
+InterfaceMemberType: ast::InterfaceMemberType = {
+    Const => ast::InterfaceMemberType::Const(<>),
+    Operation => ast::InterfaceMemberType::Operation(<>),
+    Serializer => ast::InterfaceMemberType::Serializer(<>),
+    StaticMember => ast::InterfaceMemberType::StaticMember(<>),
+    Stringifier => ast::InterfaceMemberType::Stringifier(<>),
+    Iterable => ast::InterfaceMemberType::Iterable(<>),
+    ReadOnlyMember,
+    ReadWriteAttribute => ast::InterfaceMemberType::Attribute(<>),
+    ReadWriteMaplike => {
+        ast::InterfaceMemberType::Maplike(ast::Maplike {
+            key_type: <>.0,
+            read_only: false,
+            value_type: <>.1
+        })
+    },
+    ReadWriteSetlike => {
+        ast::InterfaceMemberType::Setlike(ast::Setlike {
+            read_only: false,
+            value_type: <>
+        })
+    }
+};
+
+InterfaceMembers: Vec<ast::InterfaceMember> = {
+    (<InterfaceMember> <InterfaceMembers>)? => {
+        match <> {
+            Some((member, members)) => {
+                let mut members = members;
+                members.insert(0, member);
+                members
+            }
+            None => vec![]
+        }
+    }
+};
+
+Iterable: ast::Iterable = {
+    "iterable" "<" <key_type: TypeWithExtendedAttributes> <value_type: OptionalType> ">" ";" => {
+        match value_type {
+            Some(value_type) => {
+                ast::Iterable {
+                    key_type: Some(key_type),
+                    value_type: value_type
+                }
+            }
+            None => {
+                ast::Iterable {
+                    key_type: None,
+                    value_type: key_type
+                }
+            }
+        }
+    }
+};
+
+MaplikeRest: (Box<ast::TypeWithExtendedAttributes>, Box<ast::TypeWithExtendedAttributes>) = {
+    "maplike" "<" <key_type: TypeWithExtendedAttributes> ","
+    <value_type: TypeWithExtendedAttributes> ">" ";" => {
+        (key_type, value_type)
+    }
+};
+
+Namespace: (Vec<ast::NamespaceMember>, ast::Identifier) = {
+    "namespace" <name: "Identifier"> "{" <members: NamespaceMembers> "}" ";" => {
+        (members, name)
+    }
+};
+
+NamespaceMember: ast::NamespaceMember = {
+    <extended_attributes: ExtendedAttributeList> <type_: NamespaceMemberType> => {
+        ast::NamespaceMember { <> }
+    }
+};
+
+NamespaceMemberType: ast::NamespaceMemberType = {
+    <return_type: ReturnType> <operation_rest: OperationRest> => {
+        ast::NamespaceMemberType::Operation(ast::NamespaceMemberOperation {
+            arguments: operation_rest.0,
+            name: operation_rest.1,
+            return_type: return_type
+        })
+    },
+    "readonly" <AttributeRest> => {
+        ast::NamespaceMemberType::Attribute(ast::NamespaceMemberAttribute {
+            name: <>.0,
+            type_: <>.1
+        })
+    }
+};
+
+NamespaceMembers: Vec<ast::NamespaceMember> = {
+    (<NamespaceMember> <NamespaceMembers>)? => {
+        match <> {
+            Some((member, members)) => {
+                let mut members = members;
+                members.insert(0, member);
+                members
+            }
+            None => vec![]
+        }
+    }
+};
+
+NonAnyType: ast::NonAnyType = {
+    PromiseType => ast::NonAnyType::PromiseType(<>),
+    <type_: PrimitiveType> <nullable: Null> => ast::NonAnyType::PrimitiveType(ast::Nullable { <> }),
+    <type_: StringType> <nullable: Null> => ast::NonAnyType::StringType(ast::Nullable { <> }),
+    <type_: "Identifier"> <nullable: Null> => ast::NonAnyType::Identifier(ast::Nullable { <> }),
+    "sequence" "<" <type_: TypeWithExtendedAttributes> ">" <nullable: Null> => {
+        ast::NonAnyType::Sequence(ast::Nullable { <> })
+    },
+    "object" <nullable: Null> => ast::NonAnyType::Object(nullable),
+    "Error" <nullable: Null> => ast::NonAnyType::Error(nullable),
+    "DOMException" <nullable: Null> => ast::NonAnyType::DOMException(nullable),
+    <type_: BufferRelatedType> <nullable: Null> => {
+        ast::NonAnyType::BufferRelatedType(ast::Nullable { <> })
+    },
+    "FrozenArray" "<" <type_: TypeWithExtendedAttributes> ">" <nullable: Null> => {
+        ast::NonAnyType::FrozenArray(ast::Nullable { <> })
+    },
+    <type_: RecordType> <nullable: Null> => ast::NonAnyType::RecordType(ast::Nullable { <> })
+};
+
+Null: bool = {
+    "?"? => <>.is_some()
+};
+
+Operation: ast::Operation = {
+    <return_type: ReturnType> <operation_rest: OperationRest> => {
+        ast::Operation {
+            arguments: operation_rest.0,
+            name: operation_rest.1,
+            return_type: return_type,
+            specials: vec![]
+        }
+    },
+    SpecialOperation
+};
+
+OperationRest: (Vec<ast::Argument>, Option<ast::Identifier>) = {
+    <name: OptionalIdentifier> "(" <arguments: ArgumentList> ")" ";" => {
+        (arguments, name)
+    }
+};
+
+OptionalIdentifier: Option<ast::Identifier> = {
+    "Identifier"?
+};
+
+OptionalLong: bool = {
+    "long"? => <>.is_some()
+};
+
+OptionalType: Option<Box<ast::TypeWithExtendedAttributes>> = {
+    ("," <TypeWithExtendedAttributes>)?
+};
+
+Other: ast::Other = {
+    "FrozenArray" => ast::Other::FrozenArray,
+    "any" => ast::Other::Any,
+    "boolean" => ast::Other::Boolean,
+    "byte" => ast::Other::Byte,
+    "long" => ast::Other::IntegerType(ast::IntegerType::Long),
+    "null" => ast::Other::Null,
+    "object" => ast::Other::Object,
+    "octet" => ast::Other::Octet,
+    "optional" => ast::Other::Optional,
+    "or" => ast::Other::Or,
+    "sequence" => ast::Other::Sequence,
+    "short" => ast::Other::IntegerType(ast::IntegerType::Short),
+    "unsigned" => ast::Other::Unsigned,
+    "void" => ast::Other::Void,
+
+    "Identifier" => ast::Other::Identifier(<>),
+    "IntegerLiteral" => ast::Other::IntegerLiteral(<>),
+    "OtherLiteral" => ast::Other::OtherLiteral(<>),
+    "StringLiteral" => ast::Other::StringLiteral(<>),
+    ArgumentNameKeyword => ast::Other::ArgumentNameKeyword(<>),
+    BooleanLiteral => ast::Other::BooleanLiteral(<>),
+    BufferRelatedType => ast::Other::BufferRelatedType(<>),
+    FloatLiteral => ast::Other::FloatLiteral(<>),
+    FloatType => ast::Other::FloatType(<>),
+    StringType => ast::Other::StringType(<>),
+
+    ":" => ast::Other::Colon,
+    "..." => ast::Other::Ellipsis,
+    "=" => ast::Other::Equals,
+    ">" => ast::Other::GreaterThan,
+    "-" => ast::Other::Hyphen,
+    "<" => ast::Other::LessThan,
+    "." => ast::Other::Period,
+    "?" => ast::Other::QuestionMark,
+    ";" => ast::Other::Semicolon
+};
+
+OtherOrComma: Option<ast::Other> = {
+    Other => Some(<>),
+    "," => None
+};
+
+Partial: ast::DefinitionType = {
+    "partial" <PartialDefinition>
+};
+
+PartialDefinition: ast::DefinitionType = {
+    PartialInterface => ast::DefinitionType::Interface(<>),
+    PartialDictionary => ast::DefinitionType::Dictionary(<>),
+    Namespace => {
+        ast::DefinitionType::Namespace(ast::Namespace {
+            members: <>.0,
+            name: <>.1,
+            partial: true
+        })
+    },
+};
+
+PartialDictionary: ast::Dictionary = {
+    "dictionary" <name: "Identifier"> "{" <members: DictionaryMembers> "}" ";" => {
+        ast::Dictionary {
+            members: members,
+            name: name,
+            type_: ast::DictionaryType::Partial
+        }
+    }
+};
+
+PartialInterface: ast::Interface = {
+    "interface" <name: "Identifier"> "{" <members: InterfaceMembers> "}" ";" => {
+        ast::Interface {
+            members: members,
+            name: name,
+            type_: ast::InterfaceType::Partial
+        }
+    }
+};
+
+PrimitiveType: ast::PrimitiveType = {
+    UnrestrictedFloatType => ast::PrimitiveType::UnrestrictedFloatType(<>),
+    UnsignedIntegerType => ast::PrimitiveType::UnsignedIntegerType(<>),
+    "boolean" => ast::PrimitiveType::Boolean,
+    "byte" => ast::PrimitiveType::Byte,
+    "octet" => ast::PrimitiveType::Octet
+};
+
+PromiseType: ast::ReturnType = {
+    "Promise" "<" <ReturnType> ">"
+};
+
+ReadOnly: bool = {
+    "readonly"? => <>.is_some()
+};
+
+ReadOnlyMember: ast::InterfaceMemberType = {
+    "readonly" <ReadOnlyMemberRest>
+};
+
+ReadOnlyMemberRest: ast::InterfaceMemberType = {
+    AttributeRest => {
+        ast::InterfaceMemberType::Attribute(ast::Attribute {
+            inherit: false,
+            name: <>.0,
+            read_only: true,
+            type_: <>.1
+        })
+    },
+    ReadWriteMaplike => {
+        ast::InterfaceMemberType::Maplike(ast::Maplike {
+            key_type: <>.0,
+            read_only: true,
+            value_type: <>.1
+        })
+    },
+    ReadWriteSetlike => {
+        ast::InterfaceMemberType::Setlike(ast::Setlike {
+            read_only: true,
+            value_type: <>
+        })
+    }
+};
+
+ReadWriteAttribute: ast::Attribute = {
+    "inherit" <read_only: ReadOnly> <attribute_rest: AttributeRest> => {
+        ast::Attribute {
+            inherit: true,
+            name: attribute_rest.0,
+            read_only: read_only,
+            type_: attribute_rest.1
+        }
+    },
+    AttributeRest => {
+        ast::Attribute {
+            inherit: false,
+            name: <>.0,
+            read_only: false,
+            type_: <>.1
+        }
+    }
+};
+
+ReadWriteMaplike: (Box<ast::TypeWithExtendedAttributes>, Box<ast::TypeWithExtendedAttributes>) = {
+    MaplikeRest
+};
+
+ReadWriteSetlike: Box<ast::TypeWithExtendedAttributes> = {
+    SetlikeRest
+};
+
+RecordType: ast::RecordType = {
+    "record" "<" <key_type: StringType> "," <value_type: TypeWithExtendedAttributes> ">" => {
+        ast::RecordType { <> }
+    }
+};
+
+ReturnType: ast::ReturnType = {
+    Type => ast::ReturnType::Type(<>),
+    "void" => ast::ReturnType::Void
+};
+
+Serializer: ast::Serializer = {
+    "serializer" <SerializerRest>
+};
+
+SerializerRest: ast::Serializer = {
+    OperationRest => {
+        ast::Serializer::Operation(ast::SerializationOperation {
+            arguments: <>.0,
+            name: <>.1
+        })
+    },
+    "=" <SerializationPattern> ";" => ast::Serializer::Pattern(<>),
+    ";" => ast::Serializer::Default
+};
+
+SerializationPattern: ast::SerializationPattern = {
+    "{" <SerializationPatternMap> "}" => ast::SerializationPattern::Map(<>),
+    "[" <SerializationPatternList> "]" => ast::SerializationPattern::List(<>),
+    "Identifier" => ast::SerializationPattern::Identifier(<>)
+};
+
+SerializationPatternList: Option<ast::SerializationPatternList> = {
+    "getter" => Some(ast::SerializationPatternList::Getter),
+    <identifier: "Identifier"> <identifiers: Identifiers> => {
+        let mut identifiers = identifiers;
+        identifiers.insert(0, identifier);
+
+        Some(ast::SerializationPatternList::Identifiers(identifiers))
+    },
+    () => None
+};
+
+SerializationPatternMap: Option<ast::SerializationPatternMap> = {
+    "getter" => Some(ast::SerializationPatternMap::Getter),
+    "inherit" <Identifiers> => Some(ast::SerializationPatternMap::Inherit(<>)),
+    <identifier: "Identifier"> <identifiers: Identifiers> => {
+        let mut identifiers = identifiers;
+        identifiers.insert(0, identifier);
+
+        Some(ast::SerializationPatternMap::Identifiers(identifiers))
+    },
+    () => None
+};
+
+SetlikeRest: Box<ast::TypeWithExtendedAttributes> = {
+    "setlike" "<" <TypeWithExtendedAttributes> ">" ";"
+};
+
+SingleType: ast::SingleType = {
+    NonAnyType => ast::SingleType::NonAnyType(<>),
+    "any" => ast::SingleType::Any
+};
+
+Special: ast::Special = {
+    "deleter" => ast::Special::Deleter,
+    "getter" => ast::Special::Getter,
+    "legacycaller" => ast::Special::LegacyCaller,
+    "setter" => ast::Special::Setter
+};
+
+SpecialOperation: ast::Operation = {
+    <special: Special> <specials: Specials> <return_type: ReturnType>
+    <operation_rest: OperationRest> => {
+        let mut specials = specials;
+        specials.insert(0, special);
+
+        ast::Operation {
+            arguments: operation_rest.0,
+            name: operation_rest.1,
+            return_type: return_type,
+            specials: specials
+        }
+    }
+};
+
+Specials: Vec<ast::Special> = {
+    (<Special> <Specials>)? => {
+        match <> {
+            Some((special, specials)) => {
+                let mut specials = specials;
+                specials.insert(0, special);
+                specials
+            }
+            None => vec![]
+        }
+    }
+};
+
+StaticMember: ast::StaticMember = {
+    "static" <StaticMemberRest>
+};
+
+StaticMemberRest: ast::StaticMember = {
+    <read_only: ReadOnly> <attribute_rest: AttributeRest> => {
+        ast::StaticMember::Attribute(ast::StaticMemberAttribute {
+            name: attribute_rest.0,
+            read_only: read_only,
+            type_: attribute_rest.1
+        })
+    },
+    <return_type: ReturnType> <operation_rest: OperationRest> => {
+        ast::StaticMember::Operation(ast::StaticMemberOperation {
+            arguments: operation_rest.0,
+            name: operation_rest.1,
+            return_type: return_type
+        })
+    }
+};
+
+StringType: ast::StringType = {
+    "ByteString" => ast::StringType::ByteString,
+    "DOMString" => ast::StringType::DOMString,
+    "USVString" => ast::StringType::USVString
+};
+
+Stringifier: ast::Stringifier = {
+    "stringifier" <StringifierRest>
+};
+
+StringifierRest: ast::Stringifier = {
+    <read_only: ReadOnly> <attribute_rest: AttributeRest> => {
+        ast::Stringifier::Attribute(ast::StringifierAttribute {
+            name: attribute_rest.0,
+            read_only: read_only,
+            type_: attribute_rest.1
+        })
+    },
+    <return_type: ReturnType> <operation_rest: OperationRest> => {
+        ast::Stringifier::Operation(ast::StringifierOperation {
+            arguments: operation_rest.0,
+            name: operation_rest.1,
+            return_type: return_type
+        })
+    },
+    ";" => ast::Stringifier::Default
+};
+
+Type: Box<ast::Type> = {
+    SingleType => Box::new(ast::Type::SingleType(<>)),
+    <type_: UnionType> <nullable: Null> => {
+        Box::new(ast::Type::UnionType(ast::Nullable { <> }))
+    }
+};
+
+Typedef: ast::Typedef = {
+    "typedef" <type_: TypeWithExtendedAttributes> <name: "Identifier"> ";" => {
+        ast::Typedef { <> }
+    }
+};
+
+TypeWithExtendedAttributes: Box<ast::TypeWithExtendedAttributes> = {
+    <extended_attributes: ExtendedAttributeList> <type_: SingleType> => {
+        Box::new(ast::TypeWithExtendedAttributes::SingleType(
+            ast::SingleTypeWithExtendedAttributes { <> }))
+    },
+    <extended_attributes: ExtendedAttributeList> <type_: UnionType> <nullable: Null> => {
+        Box::new(ast::TypeWithExtendedAttributes::UnionType(
+            ast::UnionTypeWithExtendedAttributes { <> }))
+    }
+};
+
+UnionMemberType: ast::UnionMemberType = {
+    <extended_attributes: ExtendedAttributeList> <type_: NonAnyType> => {
+        ast::UnionMemberType::NonAnyType(ast::NonAnyUnionMemberType { <> })
+    },
+    <type_: UnionType> <nullable: Null> => {
+        ast::UnionMemberType::UnionType(ast::Nullable { <> })
+    }
+};
+
+UnionMemberTypes: Vec<ast::UnionMemberType> = {
+    ("or" <UnionMemberType> <UnionMemberTypes>)? => {
+        match <> {
+            Some((member, members)) => {
+                let mut members = members;
+                members.insert(0, member);
+                members
+            }
+            None => vec![]
+        }
+    }
+};
+
+UnionType: Vec<ast::UnionMemberType> = {
+    "(" <first_member: UnionMemberType> "or"
+    <second_member: UnionMemberType> <members: UnionMemberTypes> ")" => {
+        let mut members = members;
+        members.insert(0, second_member);
+        members.insert(0, first_member);
+        members
+    }
+};
+
+UnrestrictedFloatType: ast::UnrestrictedFloatType = {
+    "unrestricted" <FloatType> => {
+        ast::UnrestrictedFloatType {
+            float_type: <>,
+            restricted: false
+        }
+    },
+    FloatType => {
+        ast::UnrestrictedFloatType {
+            float_type: <>,
+            restricted: true
+        }
+    }
+};
+
+UnsignedIntegerType: ast::UnsignedIntegerType = {
+    "unsigned" <IntegerType> => {
+        ast::UnsignedIntegerType {
+            integer_type: <>,
+            unsigned: true
+        }
+    },
+    IntegerType => {
+        ast::UnsignedIntegerType {
+            integer_type: <>,
+            unsigned: false
+        }
+    }
 };
 
 extern {
@@ -79,7 +1070,7 @@ extern {
 
         // Regular expressions
         "FloatLiteral" => Token::FloatLiteral(<f64>),
-        "Identifier" => Token::Identifier(<String>),
+        "Identifier" => Token::Identifier(<ast::Identifier>),
         "IntegerLiteral" => Token::IntegerLiteral(<i64>),
         "OtherLiteral" => Token::OtherLiteral(<char>),
         "StringLiteral" => Token::StringLiteral(<String>),
