@@ -1,6 +1,6 @@
 #![allow(missing_docs)]
 
-type Identifier = String;
+pub type Identifier = String;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Argument {
@@ -126,8 +126,8 @@ pub enum DefinitionType {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Dictionary {
-    pub name: Identifier,
     pub members: Vec<DictionaryMember>,
+    pub name: Identifier,
     pub type_: DictionaryType,
 }
 
@@ -212,15 +212,19 @@ pub enum IntegerType {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Interface {
-    pub callback: bool,
-    pub inherits: Option<Identifier>,
     pub members: Vec<InterfaceMember>,
     pub name: Identifier,
     pub type_: InterfaceType,
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub enum InterfaceMember {
+pub struct InterfaceMember {
+    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub type_: InterfaceMemberType,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum InterfaceMemberType {
     Attribute(Attribute),
     Const(Const),
     Iterable(Iterable),
@@ -254,12 +258,19 @@ pub struct Maplike {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Namespace {
-    pub name: Identifier,
     pub members: Vec<NamespaceMember>,
+    pub name: Identifier,
+    pub partial: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub enum NamespaceMember {
+pub struct NamespaceMember {
+    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub type_: NamespaceMemberType,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum NamespaceMemberType {
     Attribute(NamespaceMemberAttribute),
     Operation(NamespaceMemberOperation),
 }
@@ -311,7 +322,7 @@ pub struct NonRequiredDictionaryMember {
     pub default: Option<DefaultValue>,
     pub extended_attributes: Vec<Box<ExtendedAttribute>>,
     pub name: Identifier,
-    pub type_: Box<TypeWithExtendedAttributes>,
+    pub type_: Box<Type>,
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
@@ -394,7 +405,7 @@ pub struct RequiredDictionaryMember {
     pub default: Option<DefaultValue>,
     pub extended_attributes: Vec<Box<ExtendedAttribute>>,
     pub name: Identifier,
-    pub type_: Box<Type>,
+    pub type_: Box<TypeWithExtendedAttributes>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -404,49 +415,42 @@ pub enum ReturnType {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct Setlike {
-    pub read_only: bool,
-    pub value_type: Box<TypeWithExtendedAttributes>,
-}
-
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub enum Special {
-    Deleter,
-    Getter,
-    LegacyCaller,
-    Setter,
-}
-
-#[derive(Clone, Debug, PartialEq)]
 pub enum Serializer {
-    Operation(SerializerOperation),
-    Pattern(SerializerPattern),
+    Default,
+    Operation(SerializationOperation),
+    Pattern(SerializationPattern),
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct SerializerOperation {
+pub struct SerializationOperation {
     pub arguments: Vec<Argument>,
     pub name: Option<Identifier>,
 }
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub enum SerializerPattern {
+pub enum SerializationPattern {
     Identifier(Identifier),
-    List(Option<SerializerPatternList>),
-    Map(Option<SerializerPatternMap>),
+    List(Option<SerializationPatternList>),
+    Map(Option<SerializationPatternMap>),
 }
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub enum SerializerPatternList {
+pub enum SerializationPatternList {
     Getter,
     Identifiers(Vec<Identifier>),
 }
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub enum SerializerPatternMap {
+pub enum SerializationPatternMap {
     Getter,
     Identifiers(Vec<Identifier>),
     Inherit(Vec<Identifier>),
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct Setlike {
+    pub read_only: bool,
+    pub value_type: Box<TypeWithExtendedAttributes>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -459,6 +463,14 @@ pub enum SingleType {
 pub struct SingleTypeWithExtendedAttributes {
     pub extended_attributes: Vec<Box<ExtendedAttribute>>,
     pub type_: SingleType,
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+pub enum Special {
+    Deleter,
+    Getter,
+    LegacyCaller,
+    Setter,
 }
 
 #[derive(Clone, Debug, PartialEq)]
