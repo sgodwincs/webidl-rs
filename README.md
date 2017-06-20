@@ -2,7 +2,7 @@
 
 [![LICENSE](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Build Status](https://travis-ci.org/sgodwincs/webidl-parser.svg?branch=master)](https://travis-ci.org/sgodwincs/webidl-parser)
-[![Crates.io Version](https://img.shields.io/crates/v/nom.svg)](https://crates.io/crates/webidl-parser)
+[![Crates.io Version](https://img.shields.io/crates/v/webidl-parser.svg)](https://crates.io/crates/webidl-parser)
 
 A lexer and parser for [WebIDL](https://heycam.github.io/webidl/) in Rust. Document can be found [here](https://docs.rs/webidl-parser/0.1.0/webidl_parser/).
 
