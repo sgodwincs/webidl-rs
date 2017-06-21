@@ -106,7 +106,7 @@ fn create_error(code: LexicalErrorCode, location: usize) -> LexicalError {
 /// directly from a string taken from a file.
 ///
 /// ```
-/// use webidl_parser::*;
+/// use webidl::*;
 ///
 /// let lexer = Lexer::new("/* Example taken from emscripten site */\n\
 ///                         enum EnumClass_EnumWithinClass {\n\
@@ -157,7 +157,7 @@ fn create_error(code: LexicalErrorCode, location: usize) -> LexicalError {
 /// to get tokens even if a lexical error occurs. For example:
 ///
 /// ```
-/// use webidl_parser::*;
+/// use webidl::*;
 ///
 /// let lexer = Lexer::new("identifier = 0xG");
 /// assert_eq!(lexer.collect::<Vec<_>>(),

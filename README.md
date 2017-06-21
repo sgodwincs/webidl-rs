@@ -1,19 +1,19 @@
-# webidl-parser
+# webidl-rs
 
 [![LICENSE](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Build Status](https://travis-ci.org/sgodwincs/webidl-parser.svg?branch=master)](https://travis-ci.org/sgodwincs/webidl-parser)
-[![Crates.io Version](https://img.shields.io/crates/v/webidl-parser.svg)](https://crates.io/crates/webidl-parser)
+[![Build Status](https://travis-ci.org/sgodwincs/webidl-rs.svg?branch=master)](https://travis-ci.org/sgodwincs/webidl-rs)
+[![Crates.io Version](https://img.shields.io/crates/v/webidl.svg)](https://crates.io/crates/webidl)
 
 A lexer and parser for [WebIDL](https://heycam.github.io/webidl/) in Rust.
 
-[Documentation](https://docs.rs/webidl-parser/0.1.0/webidl_parser/).
+[Documentation](https://docs.rs/webidl/0.2.0/webidl/).
 
 # Example
 
 ## Lexing
 
 ```rust
-use webidl_parser::*;
+use webidl::*;
 
 let lexer = Lexer::new("/* Example taken from emscripten site */\n\
                         enum EnumClass_EnumWithinClass {\n\
@@ -31,8 +31,8 @@ assert_eq!(lexer.collect::<Vec<_>>(),
 ## Parsing
 
 ```rust
-use webidl_parser::*;
-use webidl_parser::ast::*;
+use webidl::*;
+use webidl::ast::*;
 
 let result = Parser::parse_string("[Attribute] interface Node { };");
 

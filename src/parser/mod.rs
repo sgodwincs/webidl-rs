@@ -26,8 +26,8 @@ impl Parser {
     /// # Example
     ///
     /// ```
-    /// use webidl_parser::*;
-    /// use webidl_parser::ast::*;
+    /// use webidl::*;
+    /// use webidl::ast::*;
     ///
     /// let result = Parser::parse_string("[Attribute] interface Node { };");
     ///
