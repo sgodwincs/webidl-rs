@@ -54,7 +54,6 @@ pub enum Token {
     Record,
     Required,
     Sequence,
-    Serializer,
     Setlike,
     Setter,
     Short,

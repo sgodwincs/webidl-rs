@@ -570,7 +570,6 @@ impl<'input> Lexer<'input> {
             "record" => Token::Record,
             "required" => Token::Required,
             "sequence" => Token::Sequence,
-            "serializer" => Token::Serializer,
             "setlike" => Token::Setlike,
             "setter" => Token::Setter,
             "short" => Token::Short,
@@ -581,7 +580,13 @@ impl<'input> Lexer<'input> {
             "unrestricted" => Token::Unrestricted,
             "unsigned" => Token::Unsigned,
             "void" => Token::Void,
-            _ => Token::Identifier(identifier),
+            _ => {
+                if identifier.starts_with('_') {
+                    Token::Identifier(identifier.split_at(1).1.to_string())
+                } else {
+                    Token::Identifier(identifier)
+                }
+            }
         };
 
         Some(Ok((start, token, offset)))
@@ -889,9 +894,9 @@ mod test {
     #[test]
     fn lex_identifier() {
         assert_lex("_identifier",
-                   vec![Ok((0, Token::Identifier("_identifier".to_string()), 11))]);
+                   vec![Ok((0, Token::Identifier("identifier".to_string()), 11))]);
         assert_lex("_Identifier",
-                   vec![Ok((0, Token::Identifier("_Identifier".to_string()), 11))]);
+                   vec![Ok((0, Token::Identifier("Identifier".to_string()), 11))]);
         assert_lex("identifier",
                    vec![Ok((0, Token::Identifier("identifier".to_string()), 10))]);
         assert_lex("Identifier",
@@ -982,7 +987,6 @@ mod test {
         assert_lex("record", vec![Ok((0, Token::Record, 6))]);
         assert_lex("required", vec![Ok((0, Token::Required, 8))]);
         assert_lex("sequence", vec![Ok((0, Token::Sequence, 8))]);
-        assert_lex("serializer", vec![Ok((0, Token::Serializer, 10))]);
         assert_lex("setlike", vec![Ok((0, Token::Setlike, 7))]);
         assert_lex("setter", vec![Ok((0, Token::Setter, 6))]);
         assert_lex("short", vec![Ok((0, Token::Short, 5))]);
