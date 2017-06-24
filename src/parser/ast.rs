@@ -33,7 +33,6 @@ pub enum ArgumentNameKeyword {
     Namespace,
     Partial,
     Required,
-    Serializer,
     Setlike,
     Setter,
     Static,
@@ -230,7 +229,6 @@ pub enum InterfaceMemberType {
     Iterable(Iterable),
     Maplike(Maplike),
     Operation(Operation),
-    Serializer(Serializer),
     Setlike(Setlike),
     StaticMember(StaticMember),
     Stringifier(Stringifier),
@@ -412,39 +410,6 @@ pub struct RequiredDictionaryMember {
 pub enum ReturnType {
     Type(Box<Type>),
     Void,
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub enum Serializer {
-    Default,
-    Operation(SerializationOperation),
-    Pattern(SerializationPattern),
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub struct SerializationOperation {
-    pub arguments: Vec<Argument>,
-    pub name: Option<Identifier>,
-}
-
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub enum SerializationPattern {
-    Identifier(Identifier),
-    List(Option<SerializationPatternList>),
-    Map(Option<SerializationPatternMap>),
-}
-
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub enum SerializationPatternList {
-    Getter,
-    Identifiers(Vec<Identifier>),
-}
-
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
-pub enum SerializationPatternMap {
-    Getter,
-    Identifiers(Vec<Identifier>),
-    Inherit(Vec<Identifier>),
 }
 
 #[derive(Clone, Debug, PartialEq)]

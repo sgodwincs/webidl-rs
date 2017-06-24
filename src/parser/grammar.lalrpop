@@ -50,7 +50,7 @@ ArgumentNameKeyword: ast::ArgumentNameKeyword = {
     "maplike" => ast::ArgumentNameKeyword::Maplike,
     "namespace" => ast::ArgumentNameKeyword::Namespace,
     "partial" => ast::ArgumentNameKeyword::Partial,
-    "serializer" => ast::ArgumentNameKeyword::Serializer,
+    "required" => ast::ArgumentNameKeyword::Required,
     "setlike" => ast::ArgumentNameKeyword::Setlike,
     "setter" => ast::ArgumentNameKeyword::Setter,
     "static" => ast::ArgumentNameKeyword::Static,
@@ -459,7 +459,6 @@ InterfaceMember: ast::InterfaceMember = {
 InterfaceMemberType: ast::InterfaceMemberType = {
     Const => ast::InterfaceMemberType::Const(<>),
     Operation => ast::InterfaceMemberType::Operation(<>),
-    Serializer => ast::InterfaceMemberType::Serializer(<>),
     StaticMember => ast::InterfaceMemberType::StaticMember(<>),
     Stringifier => ast::InterfaceMemberType::Stringifier(<>),
     Iterable => ast::InterfaceMemberType::Iterable(<>),
@@ -775,50 +774,6 @@ ReturnType: ast::ReturnType = {
     "void" => ast::ReturnType::Void
 };
 
-Serializer: ast::Serializer = {
-    "serializer" <SerializerRest>
-};
-
-SerializerRest: ast::Serializer = {
-    OperationRest => {
-        ast::Serializer::Operation(ast::SerializationOperation {
-            arguments: <>.0,
-            name: <>.1
-        })
-    },
-    "=" <SerializationPattern> ";" => ast::Serializer::Pattern(<>),
-    ";" => ast::Serializer::Default
-};
-
-SerializationPattern: ast::SerializationPattern = {
-    "{" <SerializationPatternMap> "}" => ast::SerializationPattern::Map(<>),
-    "[" <SerializationPatternList> "]" => ast::SerializationPattern::List(<>),
-    "Identifier" => ast::SerializationPattern::Identifier(<>)
-};
-
-SerializationPatternList: Option<ast::SerializationPatternList> = {
-    "getter" => Some(ast::SerializationPatternList::Getter),
-    <identifier: "Identifier"> <identifiers: Identifiers> => {
-        let mut identifiers = identifiers;
-        identifiers.insert(0, identifier);
-
-        Some(ast::SerializationPatternList::Identifiers(identifiers))
-    },
-    () => None
-};
-
-SerializationPatternMap: Option<ast::SerializationPatternMap> = {
-    "getter" => Some(ast::SerializationPatternMap::Getter),
-    "inherit" <Identifiers> => Some(ast::SerializationPatternMap::Inherit(<>)),
-    <identifier: "Identifier"> <identifiers: Identifiers> => {
-        let mut identifiers = identifiers;
-        identifiers.insert(0, identifier);
-
-        Some(ast::SerializationPatternMap::Identifiers(identifiers))
-    },
-    () => None
-};
-
 SetlikeRest: Box<ast::TypeWithExtendedAttributes> = {
     "setlike" "<" <TypeWithExtendedAttributes> ">" ";"
 };
@@ -1051,7 +1006,6 @@ extern {
         "record" => Token::Record,
         "required" => Token::Required,
         "sequence" => Token::Sequence,
-        "serializer" => Token::Serializer,
         "setlike" => Token::Setlike,
         "setter" => Token::Setter,
         "short" => Token::Short,

@@ -607,20 +607,44 @@ impl<'input> Lexer<'input> {
                         self.lex_hexadecimal_literal(start, offset, literal)
                     }
                     Some(&(_, c @ '0'...'9')) => {
-                        literal.push(c);
                         offset += 2;
-                        self.chars.next();
+                        literal.push(c);
 
                         if c > '7' {
+                            if !self.lookahead_for_decimal_point() {
+                                return Some(Ok((start, Token::IntegerLiteral(0), offset - 1)));
+                            }
+
+                            self.chars.next();
                             return self.lex_float_literal(start,
                                                           offset,
                                                           literal,
                                                           FloatLexState::BeforeDecimalPoint);
                         }
 
+                        self.chars.next();
+
                         loop {
                             match self.chars.peek() {
                                 Some(&(_, c @ '0'...'9')) => {
+                                    if c > '7' {
+                                        if !self.lookahead_for_decimal_point() {
+                                            let literal = i64::from_str_radix(&*literal, 8)
+                                                .unwrap();
+                                            return Some(Ok((start,
+                                                            Token::IntegerLiteral(literal),
+                                                            offset)));
+                                        }
+
+                                        self.push_next_char(&mut literal, c, &mut offset);
+
+                                        return self.lex_float_literal(
+                                            start,
+                                            offset,
+                                            literal,
+                                            FloatLexState::BeforeDecimalPoint);
+                                    }
+
                                     self.push_next_char(&mut literal, c, &mut offset);
 
                                     if c > '7' {
@@ -704,7 +728,7 @@ impl<'input> Lexer<'input> {
                         }
                         _ => {
                             let literal = literal.parse::<i64>().unwrap();
-                            return Some(Ok((0, Token::IntegerLiteral(literal), offset)));
+                            return Some(Ok((start, Token::IntegerLiteral(literal), offset)));
                         }
                     }
                 }
@@ -771,6 +795,18 @@ impl<'input> Lexer<'input> {
                     return Some(Err(create_error(LexicalErrorCode::ExpectedStringLiteralEnd,
                                                  previous + 1)))
                 }
+            }
+        }
+    }
+
+    fn lookahead_for_decimal_point(&mut self) -> bool {
+        let mut chars = self.chars.clone();
+
+        loop {
+            match chars.next() {
+                Some((_, '0'...'9')) => continue,
+                Some((_, '.')) => return true,
+                _ => return false,
             }
         }
     }
@@ -878,7 +914,7 @@ mod test {
         assert_lex("-.5e1", vec![Ok((0, Token::FloatLiteral(-0.5e1), 5))]);
         assert_lex("-.0", vec![Ok((0, Token::FloatLiteral(0.0), 3))]);
         assert_lex("-.",
-                   vec![Err(create_error(LexicalErrorCode::ExpectedDecimalDigit, 2))])
+                   vec![Err(create_error(LexicalErrorCode::ExpectedDecimalDigit, 2))]);
     }
 
     #[test]
@@ -931,6 +967,14 @@ mod test {
         assert_lex("0", vec![Ok((0, Token::IntegerLiteral(0), 1))]);
         assert_lex("0624", vec![Ok((0, Token::IntegerLiteral(0o624), 4))]);
         assert_lex("-0624", vec![Ok((0, Token::IntegerLiteral(-0o624), 5))]);
+
+        // Octal integer literal followed by non-octal digits.
+        assert_lex("08",
+                   vec![Ok((0, Token::IntegerLiteral(0), 1)),
+                        Ok((1, Token::IntegerLiteral(8), 2))]);
+        assert_lex("01238",
+                   vec![Ok((0, Token::IntegerLiteral(0o123), 4)),
+                        Ok((4, Token::IntegerLiteral(8), 5))]);
     }
 
     #[test]
