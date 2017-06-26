@@ -799,6 +799,8 @@ impl<'input> Lexer<'input> {
         }
     }
 
+    /// A helper function that will lookahead at the following characters to see if a decimal point
+    /// follows digits. This is needed particularly in the case when lexing `01238` or similar.
     fn lookahead_for_decimal_point(&mut self) -> bool {
         let mut chars = self.chars.clone();
 
