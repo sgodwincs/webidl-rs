@@ -393,21 +393,21 @@ EnumValueListString: Vec<String> = {
 };
 
 ExtendedAttribute: Box<ast::ExtendedAttribute> = {
-    // ExtendedAttributeArgList,
-    // ExtendedAttributeIdent,
-    // ExtendedAttributeIdentList,
-    // ExtendedAttributeNamedArgList,
-    // ExtendedAttributeNoArgs,
-    ExtendedAttributeOther
+    ExtendedAttributeArgList,
+    ExtendedAttributeIdent,
+    ExtendedAttributeIdentList,
+    ExtendedAttributeNamedArgList,
+    ExtendedAttributeNoArgs,
+    // ExtendedAttributeOther
 };
 
 ExtendedAttributeInner: Box<ast::ExtendedAttribute> = {
-    // ExtendedAttributeArgList,
-    // ExtendedAttributeIdent,
-    // ExtendedAttributeIdentList,
-    // ExtendedAttributeNamedArgList,
-    // ExtendedAttributeNoArgs,
-    ExtendedAttributeOtherInner
+    ExtendedAttributeArgList,
+    ExtendedAttributeIdent,
+    ExtendedAttributeIdentList,
+    ExtendedAttributeNamedArgList,
+    ExtendedAttributeNoArgs,
+    // ExtendedAttributeOtherInner
 };
 
 ExtendedAttributeArgList: Box<ast::ExtendedAttribute> = {
@@ -420,7 +420,7 @@ ExtendedAttributeArgList: Box<ast::ExtendedAttribute> = {
 };
 
 ExtendedAttributeIdent: Box<ast::ExtendedAttribute> = {
-    <lhs: "Identifier"> "=" <rhs: "Identifier"> => {
+    <lhs: "Identifier"> "=" <rhs: Other> => {
         Box::new(ast::ExtendedAttribute::Identifier(ast::IdentifierExtendedAttribute {
             lhs: lhs,
             rhs: rhs
@@ -462,68 +462,68 @@ ExtendedAttributeNamedArgList: Box<ast::ExtendedAttribute> = {
 };
 
 ExtendedAttributeNoArgs: Box<ast::ExtendedAttribute> = {
-    "Identifier" => Box::new(ast::ExtendedAttribute::NoArguments(<>))
+    Other => Box::new(ast::ExtendedAttribute::NoArguments(<>))
 };
 
-ExtendedAttributeOther: Box<ast::ExtendedAttribute> = {
-    "(" <inner: ExtendedAttributeInner?> ")" <rest: ExtendedAttribute?> => {
-        Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
-            group_type: ast::OtherExtendedAttributeGroupType::Parenthesis,
-            inner: inner,
-            rest: rest
-        }))
-    },
-    "[" <inner: ExtendedAttributeInner?> "]" <rest: ExtendedAttribute?> => {
-        Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
-            group_type: ast::OtherExtendedAttributeGroupType::Bracket,
-            inner: inner,
-            rest: rest
-        }))
-    },
-    "{" <inner: ExtendedAttributeInner?> "}" <rest: ExtendedAttribute?> => {
-        Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
-            group_type: ast::OtherExtendedAttributeGroupType::Brace,
-            inner: inner,
-            rest: rest
-        }))
-    },
-    <other: Other> <rest: ExtendedAttribute?> => {
-        Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Other {
-            other: Some(other),
-            rest: rest
-        }))
-    }
-};
-
-ExtendedAttributeOtherInner: Box<ast::ExtendedAttribute> = {
-    "(" <inner: ExtendedAttributeInner?> ")" <rest: ExtendedAttributeInner?> => {
-        Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
-            group_type: ast::OtherExtendedAttributeGroupType::Parenthesis,
-            inner: inner,
-            rest: rest
-        }))
-    },
-    "[" <inner: ExtendedAttributeInner?> "]" <rest: ExtendedAttributeInner?> => {
-        Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
-            group_type: ast::OtherExtendedAttributeGroupType::Bracket,
-            inner: inner,
-            rest: rest
-        }))
-    },
-    "{" <inner: ExtendedAttributeInner?> "}" <rest: ExtendedAttributeInner?> => {
-        Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
-            group_type: ast::OtherExtendedAttributeGroupType::Brace,
-            inner: inner,
-            rest: rest
-        }))
-    },
-    <other: OtherOrComma> <rest: ExtendedAttributeInner?> => {
-        Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Other {
-            other: other,
-            rest: rest
-        }))
-    }
-};
+// ExtendedAttributeOther: Box<ast::ExtendedAttribute> = {
+//     "(" <inner: ExtendedAttributeInner?> ")" <rest: ExtendedAttribute?> => {
+//         Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
+//             group_type: ast::OtherExtendedAttributeGroupType::Parenthesis,
+//             inner: inner,
+//             rest: rest
+//         }))
+//     },
+//     "[" <inner: ExtendedAttributeInner?> "]" <rest: ExtendedAttribute?> => {
+//         Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
+//             group_type: ast::OtherExtendedAttributeGroupType::Bracket,
+//             inner: inner,
+//             rest: rest
+//         }))
+//     },
+//     "{" <inner: ExtendedAttributeInner?> "}" <rest: ExtendedAttribute?> => {
+//         Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
+//             group_type: ast::OtherExtendedAttributeGroupType::Brace,
+//             inner: inner,
+//             rest: rest
+//         }))
+//     },
+//     <other: Other> <rest: ExtendedAttribute?> => {
+//         Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Other {
+//             other: Some(other),
+//             rest: rest
+//         }))
+//     }
+// };
+//
+// ExtendedAttributeOtherInner: Box<ast::ExtendedAttribute> = {
+//     "(" <inner: ExtendedAttributeInner?> ")" <rest: ExtendedAttributeInner?> => {
+//         Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
+//             group_type: ast::OtherExtendedAttributeGroupType::Parenthesis,
+//             inner: inner,
+//             rest: rest
+//         }))
+//     },
+//     "[" <inner: ExtendedAttributeInner?> "]" <rest: ExtendedAttributeInner?> => {
+//         Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
+//             group_type: ast::OtherExtendedAttributeGroupType::Bracket,
+//             inner: inner,
+//             rest: rest
+//         }))
+//     },
+//     "{" <inner: ExtendedAttributeInner?> "}" <rest: ExtendedAttributeInner?> => {
+//         Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
+//             group_type: ast::OtherExtendedAttributeGroupType::Brace,
+//             inner: inner,
+//             rest: rest
+//         }))
+//     },
+//     <other: OtherOrComma> <rest: ExtendedAttributeInner?> => {
+//         Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Other {
+//             other: other,
+//             rest: rest
+//         }))
+//     }
+// };
 
 ExtendedAttributes: Vec<Box<ast::ExtendedAttribute>> = {
     ("," <ExtendedAttribute> <ExtendedAttributes>)? => {

@@ -39,10 +39,8 @@ let result = Parser::parse_string("[Attribute] interface Node { };");
 assert_eq!(result,
            Ok(vec![Definition::Interface(Interface::NonPartial(NonPartialInterface {
                 extended_attributes: vec![
-                    Box::new(ExtendedAttribute::Other(OtherExtendedAttribute::Other {
-                        other: Some(Other::Identifier("Attribute".to_string())),
-                        rest: None,
-                    }))],
+                    Box::new(ExtendedAttribute::NoArguments(
+                        Other::Identifier("Attribute".to_string())))],
                 inherits: None,
                 members: vec![],
                 name: "Node".to_string()

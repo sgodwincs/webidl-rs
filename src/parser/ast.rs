@@ -180,14 +180,14 @@ pub enum ExtendedAttribute {
     Identifier(IdentifierExtendedAttribute),
     IdentifierList(IdentifierListExtendedAttribute),
     NamedArgumentList(NamedArgumentListExtendedAttribute),
-    NoArguments(Identifier),
-    Other(OtherExtendedAttribute),
+    NoArguments(Other),
+    //Other(OtherExtendedAttribute),
 }
 
-#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct IdentifierExtendedAttribute {
     pub lhs: Identifier,
-    pub rhs: Identifier,
+    pub rhs: Other,
 }
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
