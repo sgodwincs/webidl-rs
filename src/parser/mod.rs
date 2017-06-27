@@ -21,6 +21,12 @@ pub type ParseResult = Result<Vec<ast::Definition>, ParseError<usize, Token, Lex
 pub struct Parser;
 
 impl Parser {
+    /// This exists because the parser may be extended later to support merging ASTs to perform
+    /// semantic analysis or create symbol tables.
+    pub fn new() -> Self {
+        Parser
+    }
+
     /// Parses a given input string and returns an AST.
     ///
     /// # Example
@@ -29,7 +35,8 @@ impl Parser {
     /// use webidl::*;
     /// use webidl::ast::*;
     ///
-    /// let result = Parser::parse_string("[Attribute] interface Node { };");
+    /// let parser = Parser::new();
+    /// let result = parser.parse_string("[Attribute] interface Node { };");
     ///
     /// assert_eq!(result,
     ///            Ok(vec![Definition::Interface(Interface::NonPartial(NonPartialInterface {
@@ -41,7 +48,7 @@ impl Parser {
     ///                 name: "Node".to_string()
     ///            }))]));
     /// ```
-    pub fn parse_string(input: &str) -> ParseResult {
+    pub fn parse_string(&self, input: &str) -> ParseResult {
         grammar::parse_Definitions(::Lexer::new(input))
     }
 }

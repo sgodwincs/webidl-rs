@@ -8,6 +8,7 @@ use webidl::*;
 
 #[test]
 fn parse_servo_webidls() {
+    let parser = Parser::new();
     let file = fs::File::open("tests/mozilla_webidls.zip").unwrap();
     let mut archive = zip::ZipArchive::new(file).unwrap();
 
@@ -27,6 +28,6 @@ fn parse_servo_webidls() {
         let mut webidl = String::new();
         file.read_to_string(&mut webidl).unwrap();
 
-        assert!(Parser::parse_string(&*webidl).is_ok());
+        assert!(parser.parse_string(&*webidl).is_ok());
     }
 }
