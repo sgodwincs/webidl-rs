@@ -181,7 +181,7 @@ pub enum ExtendedAttribute {
     IdentifierList(IdentifierListExtendedAttribute),
     NamedArgumentList(NamedArgumentListExtendedAttribute),
     NoArguments(Other),
-    //Other(OtherExtendedAttribute),
+    // Other(OtherExtendedAttribute),
 }
 
 #[derive(Clone, Debug, PartialEq)]

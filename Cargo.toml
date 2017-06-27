@@ -19,5 +19,8 @@ lalrpop-util = "0.13.1"
 optional = true
 version = "0.0.140"
 
+[dev-dependencies]
+zip = "0.2.3"
+
 [features]
 default = []
