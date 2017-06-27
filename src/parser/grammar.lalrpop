@@ -636,8 +636,8 @@ InterfaceMembers: Vec<ast::InterfaceMember> = {
                             }
                         }
                     }
-                    ast::InterfaceMember::Const(ref mut const_member) => {
-                        const_member.extended_attributes = extended_attributes;
+                    ast::InterfaceMember::Const(ref mut const_) => {
+                        const_.extended_attributes = extended_attributes;
                     }
                     ast::InterfaceMember::Iterable(ref mut iterable) => {
                         iterable.extended_attributes = extended_attributes;

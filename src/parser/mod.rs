@@ -6,6 +6,9 @@ mod grammar;
 /// Contains all structures related to the AST for the WebIDL grammar.
 pub mod ast;
 
+/// Contains the visitor trait needed to traverse the AST and helper walk functions.
+pub mod visitor;
+
 use lalrpop_util::ParseError;
 
 use lexer::{LexicalError, Token};

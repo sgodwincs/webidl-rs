@@ -409,20 +409,20 @@ pub struct PartialNamespace {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct RegularOperation {
-    pub arguments: Vec<Argument>,
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
-    pub name: Option<Identifier>,
-    pub return_type: ReturnType,
-}
-
-#[derive(Clone, Debug, PartialEq)]
 pub struct RegularAttribute {
     pub extended_attributes: Vec<Box<ExtendedAttribute>>,
     pub inherits: bool,
     pub name: Identifier,
     pub read_only: bool,
     pub type_: Box<Type>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct RegularOperation {
+    pub arguments: Vec<Argument>,
+    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub name: Option<Identifier>,
+    pub return_type: ReturnType,
 }
 
 #[derive(Clone, Debug, PartialEq)]
