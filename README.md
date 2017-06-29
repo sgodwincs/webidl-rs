@@ -34,7 +34,8 @@ assert_eq!(lexer.collect::<Vec<_>>(),
 use webidl::*;
 use webidl::ast::*;
 
-let result = Parser::parse_string("[Attribute] interface Node { };");
+let parser = Parser::new();
+let result = parser.parse_string("[Attribute] interface Node { };");
 
 assert_eq!(result,
            Ok(vec![Definition::Interface(Interface::NonPartial(NonPartialInterface {
