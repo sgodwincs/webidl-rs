@@ -46,3 +46,35 @@ assert_eq!(result,
                 name: "Node".to_string()
            }))]));
 ```
+
+## Pretty printing AST
+
+An example of a visitor implementation can be found [here](https://github.com/sgodwincs/webidl-rs/blob/master/src/parser/visitor/pretty_print.rs). Below is an example of how it is used:
+
+```rust
+use webidl::ast::*;
+use webidl::visitor::*;
+
+let ast = vec![Definition::Interface(Interface::NonPartial(NonPartialInterface {
+                extended_attributes: vec![
+                    Box::new(ExtendedAttribute::NoArguments(
+                        Other::Identifier("Attribute".to_string())))],
+                inherits: None,
+                members: vec![InterfaceMember::Attribute(Attribute::Regular(RegularAttribute {
+                             extended_attributes: vec![],
+                             inherits: false,
+                             name: "attr".to_string(),
+                             read_only: true,
+                             type_: Box::new(Type {
+                                 extended_attributes: vec![],
+                                 kind: TypeKind::SignedLong,
+                                 nullable: true
+                             })
+                         }))],
+                name: "Node".to_string()
+          }))];
+let mut visitor = PrettyPrintVisitor::new();
+visitor.visit(&ast);
+assert_eq!(visitor.get_output(),
+           "[Attribute]\ninterface Node {\n    readonly attribute long? attr;\n};\n\n");
+```

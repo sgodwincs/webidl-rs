@@ -20,7 +20,7 @@ pub type ParseResult = Result<Vec<ast::Definition>, ParseError<usize, Token, Lex
 
 /// The parser that is used to parse WebIDL. It really serves as a wrapper around the parse
 /// function exposed by lalrpop.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq)]
 pub struct Parser;
 
 impl Parser {
