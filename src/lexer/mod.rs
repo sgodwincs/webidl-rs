@@ -522,7 +522,6 @@ impl<'input> Lexer<'input> {
             "ArrayBuffer" => Token::ArrayBuffer,
             "ByteString" => Token::ByteString,
             "DataView" => Token::DataView,
-            "DOMException" => Token::DOMException,
             "DOMString" => Token::DOMString,
             "Error" => Token::Error,
             "Float32Array" => Token::Float32Array,
@@ -984,7 +983,6 @@ mod test {
         assert_lex("ArrayBuffer", vec![Ok((0, Token::ArrayBuffer, 11))]);
         assert_lex("ByteString", vec![Ok((0, Token::ByteString, 10))]);
         assert_lex("DataView", vec![Ok((0, Token::DataView, 8))]);
-        assert_lex("DOMException", vec![Ok((0, Token::DOMException, 12))]);
         assert_lex("DOMString", vec![Ok((0, Token::DOMString, 9))]);
         assert_lex("Error", vec![Ok((0, Token::Error, 5))]);
         assert_lex("Float32Array", vec![Ok((0, Token::Float32Array, 12))]);

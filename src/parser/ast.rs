@@ -507,7 +507,6 @@ pub enum TypeKind {
     Boolean,
     Byte,
     ByteString,
-    DOMException,
     DOMString,
     DataView,
     Error,

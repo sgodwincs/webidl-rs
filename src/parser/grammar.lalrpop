@@ -856,13 +856,6 @@ NonAnyType: Box<ast::Type> = {
             kind: ast::TypeKind::Error
         })
     },
-    "DOMException" <nullable: Null> => {
-        Box::new(ast::Type {
-            extended_attributes: vec![],
-            nullable: nullable,
-            kind: ast::TypeKind::DOMException
-        })
-    },
     <type_: BufferRelatedType> <nullable: Null> => {
         let type_ = match type_ {
             ast::BufferRelatedType::ArrayBuffer => ast::TypeKind::ArrayBuffer,
@@ -1349,7 +1342,6 @@ extern {
         "DataView" => Token::DataView,
         "deleter" => Token::Deleter,
         "dictionary" => Token::Dictionary,
-        "DOMException" => Token::DOMException,
         "DOMString" => Token::DOMString,
         "double" => Token::Double,
         "enum" => Token::Enum,

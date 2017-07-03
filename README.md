@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/sgodwincs/webidl-rs.svg?branch=master)](https://travis-ci.org/sgodwincs/webidl-rs)
 [![Crates.io Version](https://img.shields.io/crates/v/webidl.svg)](https://crates.io/crates/webidl)
 
-A lexer and parser for [WebIDL](https://heycam.github.io/webidl/) in Rust.
+A parser for [WebIDL](https://heycam.github.io/webidl/) in Rust.
 
 [Documentation](https://docs.rs/webidl/0.2.0/webidl/).
 
@@ -79,3 +79,10 @@ visitor.visit(&ast);
 assert_eq!(visitor.get_output(),
            "[Attribute]\ninterface Node {\n    readonly attribute long? attr;\n};\n\n");
 ```
+
+# Conformance
+
+The parser is conformant with regards to the [WebIDL grammar](https://heycam.github.io/webidl/#idl-grammar) except for the following points:
+
+- `DOMException` is not considered a keyword (terminal) in the parser, whereas it is in the grammar.
+- Extended attributes, as described by the grammar, are not supported due to their lack of semantic meaning when parsed. Instead, limited forms are supported (as shown in the [table](https://heycam.github.io/webidl/#idl-extended-attributes)). This parser allows a bit more flexibility when parsing extended attributes of the form `A=B`. The specification states that `A` and `B` must be identifiers, but this parser accepts `B` as any token. If you would like for any extended attributes to be parsed (essentially any sequences of tokens), please consider looking at [#8](https://github.com/sgodwincs/webidl-rs/issues/8) to help resolve the problem with doing so.

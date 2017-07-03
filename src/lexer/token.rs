@@ -18,7 +18,6 @@ pub enum Token {
     DataView,
     Deleter,
     Dictionary,
-    DOMException,
     DOMString,
     Double,
     Enum,
