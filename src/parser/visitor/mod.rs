@@ -1,7 +1,10 @@
 #![allow(missing_docs)]
 
 /// Converts AST to a pretty printed source string.
-mod pretty_print;
+pub mod pretty_print;
+
+/// Traverses the AST and validates it against the invariants defined by the specification.
+pub mod validator;
 
 use super::ast::*;
 
