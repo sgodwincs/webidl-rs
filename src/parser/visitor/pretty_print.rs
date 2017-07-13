@@ -44,8 +44,8 @@ impl PrettyPrintVisitor {
         PrettyPrintVisitor { output: String::new() }
     }
 
-    pub fn get_output(&self) -> String {
-        self.output.clone()
+    pub fn get_output(&self) -> &String {
+        &self.output
     }
 
     fn stringify_arguments(&mut self, arguments: &[Argument]) {
