@@ -16,7 +16,7 @@ use lexer::{LexicalError, Token};
 /// The result that is returned when an input string is parsed. If the parse succeeds, the `Ok`
 /// result will be a vector of definitions representing the AST. If the parse fails, the `Err` will
 /// be either an error from the lexer or the parser.
-pub type ParseResult = Result<Vec<ast::Definition>, ParseError<usize, Token, LexicalError>>;
+pub type ParseResult = Result<ast::AST, ParseError<usize, Token, LexicalError>>;
 
 /// The parser that is used to parse WebIDL. It really serves as a wrapper around the parse
 /// function exposed by lalrpop.
@@ -24,8 +24,7 @@ pub type ParseResult = Result<Vec<ast::Definition>, ParseError<usize, Token, Lex
 pub struct Parser;
 
 impl Parser {
-    /// This exists because the parser may be extended later to support merging ASTs to perform
-    /// semantic analysis or create symbol tables.
+    /// Creates a new parser.
     pub fn new() -> Self {
         Parser
     }

@@ -9,23 +9,23 @@ Argument: ast::Argument = {
     <extended_attributes: ExtendedAttributeList> "optional"
     <type_: TypeWithExtendedAttributes> <name: ArgumentName> <default: Default> => {
         ast::Argument {
-            extended_attributes: extended_attributes,
-            default: default,
-            name: name,
+            extended_attributes,
+            default,
+            name,
             optional: true,
-            type_: type_,
+            type_,
             variadic: false
         }
     },
     <extended_attributes: ExtendedAttributeList> <type_: Type>
     <variadic: Ellipsis> <name: ArgumentName> => {
         ast::Argument {
-            extended_attributes: extended_attributes,
+            extended_attributes,
             default: None,
-            name: name,
+            name,
             optional: variadic,
-            type_: type_,
-            variadic: variadic
+            type_,
+            variadic
         }
     }
 };
@@ -133,10 +133,10 @@ CallbackOrInterface: ast::Definition = {
 CallbackRest: ast::Callback = {
     <name: "Identifier"> "=" <return_type: ReturnType> "(" <arguments: ArgumentList> ")" ";" => {
         ast::Callback {
-            arguments: arguments,
+            arguments,
             extended_attributes: vec![],
-            name: name,
-            return_type: return_type
+            name,
+            return_type
         }
     }
 };
@@ -157,10 +157,10 @@ Const: ast::Const = {
     "const" <type_: ConstType> <name: "Identifier"> "=" <value: ConstValue> ";" => {
         ast::Const {
             extended_attributes: vec![],
-            name: name,
+            name,
             nullable: type_.1,
             type_: type_.0,
-            value: value
+            value
         }
     }
 };
@@ -305,9 +305,9 @@ Dictionary: ast::Dictionary = {
     "{" <members: DictionaryMembers> "}" ";" => {
         ast::Dictionary::NonPartial(ast::NonPartialDictionary {
             extended_attributes: vec![],
-            inherits: inherits,
-            members: members,
-            name: name
+            inherits,
+            members,
+            name
         })
     }
 };
@@ -316,21 +316,21 @@ DictionaryMember: ast::DictionaryMember = {
     <extended_attributes: ExtendedAttributeList> "required"
     <type_: TypeWithExtendedAttributes> <name: "Identifier"> <default: Default> ";" => {
         ast::DictionaryMember {
-            default: default,
-            extended_attributes: extended_attributes,
-            name: name,
+            default,
+            extended_attributes,
+            name,
             required: true,
-            type_: type_
+            type_
         }
     },
     <extended_attributes: ExtendedAttributeList> <type_: Type>
     <name: "Identifier"> <default: Default> ";" => {
         ast::DictionaryMember {
-            default: default,
-            extended_attributes: extended_attributes,
-            name: name,
+            default,
+            extended_attributes,
+            name,
             required: false,
-            type_: type_
+            type_
         }
     }
 };
@@ -356,8 +356,8 @@ Enum: ast::Enum = {
     "enum" <name: "Identifier"> "{" <variants: EnumValueList> "}" ";" => {
         ast::Enum {
             extended_attributes: vec![],
-            name: name,
-            variants: variants
+            name,
+            variants
         }
     }
 };
@@ -413,8 +413,8 @@ ExtendedAttributeInner: Box<ast::ExtendedAttribute> = {
 ExtendedAttributeArgList: Box<ast::ExtendedAttribute> = {
     <name: "Identifier"> "(" <arguments: ArgumentList> ")" => {
         Box::new(ast::ExtendedAttribute::ArgumentList(ast::ArgumentListExtendedAttribute {
-            arguments: arguments,
-            name: name
+            arguments,
+            name
         }))
     }
 };
@@ -422,8 +422,8 @@ ExtendedAttributeArgList: Box<ast::ExtendedAttribute> = {
 ExtendedAttributeIdent: Box<ast::ExtendedAttribute> = {
     <lhs: "Identifier"> "=" <rhs: Other> => {
         Box::new(ast::ExtendedAttribute::Identifier(ast::IdentifierExtendedAttribute {
-            lhs: lhs,
-            rhs: rhs
+            lhs,
+            rhs
         }))
     }
 };
@@ -431,8 +431,8 @@ ExtendedAttributeIdent: Box<ast::ExtendedAttribute> = {
 ExtendedAttributeIdentList: Box<ast::ExtendedAttribute> = {
     <lhs: "Identifier"> "=" "(" <rhs: IdentifierList> ")" => {
         Box::new(ast::ExtendedAttribute::IdentifierList(ast::IdentifierListExtendedAttribute {
-            lhs: lhs,
-            rhs: rhs
+            lhs,
+            rhs
         }))
     }
 };
@@ -454,9 +454,9 @@ ExtendedAttributeNamedArgList: Box<ast::ExtendedAttribute> = {
     <lhs_name: "Identifier"> "=" <rhs_name: "Identifier">
     "(" <rhs_arguments: ArgumentList> ")" => {
         Box::new(ast::ExtendedAttribute::NamedArgumentList(ast::NamedArgumentListExtendedAttribute {
-            lhs_name: lhs_name,
-            rhs_name: rhs_name,
-            rhs_arguments: rhs_arguments
+            lhs_name,
+            rhs_name,
+            rhs_arguments
         }))
     }
 };
@@ -570,8 +570,8 @@ ImplementsStatement: ast::Implements = {
     <implementor: "Identifier"> "implements" <implementee: "Identifier"> ";" => {
         ast::Implements {
             extended_attributes: vec![],
-            implementor: implementor,
-            implementee: implementee
+            implementor,
+            implementee
         }
     }
 };
@@ -689,7 +689,7 @@ Iterable: ast::Iterable = {
                 ast::Iterable {
                     extended_attributes: vec![],
                     key_type: Some(key_type),
-                    value_type: value_type
+                    value_type
                 }
             }
             None => {
@@ -722,7 +722,7 @@ NamespaceMember: ast::NamespaceMember = {
             arguments: operation_rest.1,
             extended_attributes: vec![],
             name: operation_rest.0,
-            return_type: return_type
+            return_type
         }))
     },
     "readonly" <AttributeRest> => {
@@ -811,7 +811,7 @@ NonAnyType: Box<ast::Type> = {
 
         Box::new(ast::Type {
             extended_attributes: vec![],
-            nullable: nullable,
+            nullable,
             kind: type_
         })
     },
@@ -824,7 +824,7 @@ NonAnyType: Box<ast::Type> = {
 
         Box::new(ast::Type {
             extended_attributes: vec![],
-            nullable: nullable,
+            nullable,
             kind: type_
         })
     },
@@ -838,21 +838,21 @@ NonAnyType: Box<ast::Type> = {
     "sequence" "<" <type_: TypeWithExtendedAttributes> ">" <nullable: Null> => {
         Box::new(ast::Type {
             extended_attributes: vec![],
-            nullable: nullable,
+            nullable,
             kind: ast::TypeKind::Sequence(type_)
         })
     },
     "object" <nullable: Null> => {
         Box::new(ast::Type {
             extended_attributes: vec![],
-            nullable: nullable,
+            nullable,
             kind: ast::TypeKind::Object
         })
     },
     "Error" <nullable: Null> => {
         Box::new(ast::Type {
             extended_attributes: vec![],
-            nullable: nullable,
+            nullable,
             kind: ast::TypeKind::Error
         })
     },
@@ -873,21 +873,21 @@ NonAnyType: Box<ast::Type> = {
 
         Box::new(ast::Type {
             extended_attributes: vec![],
-            nullable: nullable,
+            nullable,
             kind: type_
         })
     },
     "FrozenArray" "<" <type_: TypeWithExtendedAttributes> ">" <nullable: Null> => {
         Box::new(ast::Type {
             extended_attributes: vec![],
-            nullable: nullable,
+            nullable,
             kind: ast::TypeKind::FrozenArray(type_)
         })
     },
     <type_: RecordType> <nullable: Null> => {
         Box::new(ast::Type {
             extended_attributes: vec![],
-            nullable: nullable,
+            nullable,
             kind: ast::TypeKind::Record(type_.0, type_.1)
         })
     }
@@ -903,7 +903,7 @@ Operation: ast::Operation = {
             arguments: operation_rest.1,
             extended_attributes: vec![],
             name: operation_rest.0,
-            return_type: return_type
+            return_type
         })
     },
     SpecialOperation
@@ -1024,8 +1024,8 @@ PartialDictionary: ast::Dictionary = {
     "dictionary" <name: "Identifier"> "{" <members: DictionaryMembers> "}" ";" => {
         ast::Dictionary::Partial(ast::PartialDictionary {
             extended_attributes: vec![],
-            members: members,
-            name: name
+            members,
+            name
         })
     }
 };
@@ -1034,8 +1034,8 @@ PartialInterface: ast::Interface = {
     "interface" <name: "Identifier"> "{" <members: InterfaceMembers> "}" ";" => {
         ast::Interface::Partial(ast::PartialInterface {
             extended_attributes: vec![],
-            members: members,
-            name: name
+            members,
+            name
         })
     }
 };
@@ -1093,7 +1093,7 @@ ReadWriteAttribute: ast::Attribute = {
             extended_attributes: vec![],
             inherits: true,
             name: attribute_rest.1,
-            read_only: read_only,
+            read_only,
             type_: attribute_rest.0
         })
     },
@@ -1152,7 +1152,7 @@ SpecialOperation: ast::Operation = {
             arguments: operation_rest.1,
             extended_attributes: vec![],
             name: operation_rest.0,
-            return_type: return_type,
+            return_type,
             special_keywords: specials
         })
     }
@@ -1187,7 +1187,7 @@ StaticMemberRest: ast::InterfaceMember = {
         ast::InterfaceMember::Attribute(ast::Attribute::Static(ast::StaticAttribute {
             extended_attributes: vec![],
             name: attribute_rest.1,
-            read_only: read_only,
+            read_only,
             type_: attribute_rest.0
         }))
     },
@@ -1196,7 +1196,7 @@ StaticMemberRest: ast::InterfaceMember = {
             arguments: operation_rest.1,
             extended_attributes: vec![],
             name: operation_rest.0,
-            return_type: return_type
+            return_type
         }))
     }
 };
@@ -1216,7 +1216,7 @@ StringifierRest: ast::InterfaceMember = {
         ast::InterfaceMember::Attribute(ast::Attribute::Stringifier(ast::StringifierAttribute {
             extended_attributes: vec![],
             name: attribute_rest.1,
-            read_only: read_only,
+            read_only,
             type_: attribute_rest.0
         }))
     },
@@ -1240,7 +1240,7 @@ Type: Box<ast::Type> = {
     <type_: UnionType> <nullable: Null> => {
         Box::new(ast::Type {
             extended_attributes: vec![],
-            nullable: nullable,
+            nullable,
             kind: ast::TypeKind::Union(type_)
         })
     }
@@ -1254,8 +1254,8 @@ TypeWithExtendedAttributes: Box<ast::Type> = {
     },
     <extended_attributes: ExtendedAttributeList> <type_: UnionType> <nullable: Null> => {
         Box::new(ast::Type {
-            extended_attributes: extended_attributes,
-            nullable: nullable,
+            extended_attributes,
+            nullable,
             kind: ast::TypeKind::Union(type_)
         })
     }
@@ -1281,7 +1281,7 @@ UnionMemberType: Box<ast::Type> = {
         Box::new(ast::Type {
             extended_attributes: vec![],
             kind: ast::TypeKind::Union(type_),
-            nullable: nullable
+            nullable
         })
     }
 };
