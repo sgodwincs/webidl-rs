@@ -1,5 +1,6 @@
 #![allow(missing_docs)]
 
+pub type AST = Vec<Definition>;
 pub type Identifier = String;
 
 // The following structures are used to help simplify building the AST in the grammar. Ideally
@@ -545,4 +546,37 @@ pub struct Typedef {
     pub extended_attributes: Vec<Box<ExtendedAttribute>>,
     pub name: Identifier,
     pub type_: Box<Type>,
+}
+
+/// Consumes a vector of ASTs that are flattened into a single AST. This is helpful if you want to
+/// merge ASTs from multiple files and be able to use the visitor pattern across all of them.
+pub fn flatten_asts(asts: Vec<AST>) -> AST {
+    asts.into_iter().flat_map(|ast| ast).collect()
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_flatten_asts() {
+        let ast1 = vec![Definition::Interface(Interface::NonPartial(NonPartialInterface {
+                                                                        extended_attributes: vec![],
+                                                                        inherits: None,
+                                                                        members: vec![],
+                                                                        name: "Node".to_string(),
+                                                                    }))];
+        let ast2 = vec![Definition::Typedef(Typedef {
+                                                extended_attributes: vec![],
+                                                name: "Typedef".to_string(),
+                                                type_: Box::new(Type {
+                                                                    extended_attributes: vec![],
+                                                                    kind: TypeKind::Any,
+                                                                    nullable: false,
+                                                                }),
+                                            })];
+
+        assert_eq!(flatten_asts(vec![ast1.clone(), ast2.clone()]),
+                   vec![ast1[0].clone(), ast2[0].clone()]);
+    }
 }
