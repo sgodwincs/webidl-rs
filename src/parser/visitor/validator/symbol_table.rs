@@ -126,9 +126,11 @@ impl SymbolTable {
     pub fn insert_symbol(&mut self, name: Identifier, symbol: Symbol) -> errors::Result<()> {
         let current_scope = self.current_scope.get();
         let symbol_node = self.get_symbol_node_mut(current_scope);
-        symbol_node.insert(name, symbol).map(|symbol| ()).ok_or(
-            errors::ErrorKind::SymbolAlreadyExists(symbol).into(),
-        )
+
+        match symbol_node.insert(name, symbol) {
+            Some(old_symbol) => Err(errors::ErrorKind::SymbolAlreadyExists(old_symbol).into()),
+            None => Ok(()),
+        }
     }
 
     pub fn lookup_local_symbol(&self, name: &str) -> Option<&Symbol> {
