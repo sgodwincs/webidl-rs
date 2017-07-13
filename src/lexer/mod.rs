@@ -89,10 +89,7 @@ enum FloatLexState {
 
 /// A helper function for creating a lexical error.
 fn create_error(code: LexicalErrorCode, location: usize) -> LexicalError {
-    LexicalError {
-        code: code,
-        location: location,
-    }
+    LexicalError { code, location }
 }
 
 /// The lexer that is used to perform lexical analysis on the WebIDL grammar. The lexer implements
@@ -190,7 +187,7 @@ impl<'input> Lexer<'input> {
     pub fn new(input: &'input str) -> Self {
         Lexer {
             chars: input.char_indices().peekable(),
-            input: input,
+            input,
         }
     }
 
@@ -317,8 +314,12 @@ impl<'input> Lexer<'input> {
                     match self.chars.next() {
                         Some((_, '/')) => break,
                         Some(_) => continue,
-                        None => return Some(Err(create_error(
-                            LexicalErrorCode::ExpectedCommentBlockEnd, previous + 1))),
+                        None => {
+                            return Some(Err(create_error(
+                                LexicalErrorCode::ExpectedCommentBlockEnd,
+                                previous + 1,
+                            )))
+                        }
                     }
                 }
                 Some(_) => continue,
@@ -370,7 +371,7 @@ impl<'input> Lexer<'input> {
                         }
                         _ => {
                             panic!("Integer literals should not be\
-                                    able to be lexed as float literals")
+                                 able to be lexed as float literals")
                         }
                     }
                 }
@@ -383,7 +384,7 @@ impl<'input> Lexer<'input> {
                         Some(&(_, 'e')) | Some(&(_, 'E')) => {
                             if float_literal.chars().count() == 1 {
                                 panic!("A leading decimal point followed by\
-                                        an exponent should not be possible");
+                                     an exponent should not be possible");
                             }
 
                             self.push_next_char(&mut float_literal, 'e', &mut offset);
@@ -641,7 +642,8 @@ impl<'input> Lexer<'input> {
                                             start,
                                             offset,
                                             literal,
-                                            FloatLexState::BeforeDecimalPoint);
+                                            FloatLexState::BeforeDecimalPoint,
+                                        );
                                     }
 
                                     self.push_next_char(&mut literal, c, &mut offset);
@@ -651,7 +653,8 @@ impl<'input> Lexer<'input> {
                                             start,
                                             offset,
                                             literal,
-                                            FloatLexState::BeforeDecimalPoint);
+                                            FloatLexState::BeforeDecimalPoint,
+                                        );
                                     }
                                 }
                                 Some(&(_, '.')) => {
@@ -661,7 +664,8 @@ impl<'input> Lexer<'input> {
                                         start,
                                         offset,
                                         literal,
-                                        FloatLexState::ImmediatelyAfterDecimalPoint);
+                                        FloatLexState::ImmediatelyAfterDecimalPoint,
+                                    );
                                 }
                                 Some(&(_, 'e')) | Some(&(_, 'E')) => {
                                     self.push_next_char(&mut literal, 'e', &mut offset);
@@ -670,7 +674,8 @@ impl<'input> Lexer<'input> {
                                         start,
                                         offset,
                                         literal,
-                                        FloatLexState::ImmediatelyAfterExponentBase);
+                                        FloatLexState::ImmediatelyAfterExponentBase,
+                                    );
                                 }
                                 _ => {
                                     let literal = i64::from_str_radix(&*literal, 8).unwrap();
@@ -714,7 +719,8 @@ impl<'input> Lexer<'input> {
                                 start,
                                 offset,
                                 literal,
-                                FloatLexState::ImmediatelyAfterDecimalPoint);
+                                FloatLexState::ImmediatelyAfterDecimalPoint,
+                            );
                         }
                         Some(&(_, 'e')) | Some(&(_, 'E')) => {
                             self.push_next_char(&mut literal, 'e', &mut offset);
@@ -723,7 +729,8 @@ impl<'input> Lexer<'input> {
                                 start,
                                 offset,
                                 literal,
-                                FloatLexState::ImmediatelyAfterExponentBase);
+                                FloatLexState::ImmediatelyAfterExponentBase,
+                            );
                         }
                         _ => {
                             let literal = literal.parse::<i64>().unwrap();
@@ -885,11 +892,17 @@ mod test {
         assert_lex("0e-1", vec![Ok((0, Token::FloatLiteral(0e-1), 4))]);
         assert_lex("041e+9", vec![Ok((0, Token::FloatLiteral(41e+9), 6))]);
         assert_lex("021e",
-                   vec![Err(create_error(LexicalErrorCode::ExpectedFloatExponent, 4))]);
+                   vec![
+                Err(create_error(LexicalErrorCode::ExpectedFloatExponent, 4)),
+            ]);
         assert_lex("01e+",
-                   vec![Err(create_error(LexicalErrorCode::ExpectedFloatExponent, 4))]);
+                   vec![
+                Err(create_error(LexicalErrorCode::ExpectedFloatExponent, 4)),
+            ]);
         assert_lex("01e-",
-                   vec![Err(create_error(LexicalErrorCode::ExpectedFloatExponent, 4))]);
+                   vec![
+                Err(create_error(LexicalErrorCode::ExpectedFloatExponent, 4)),
+            ]);
 
         // Without leading 0
         assert_lex("5162.", vec![Ok((0, Token::FloatLiteral(5162.0), 5))]);
@@ -899,11 +912,17 @@ mod test {
         assert_lex("612e61", vec![Ok((0, Token::FloatLiteral(612e61), 6))]);
         assert_lex("41e+9", vec![Ok((0, Token::FloatLiteral(41e+9), 5))]);
         assert_lex("21e",
-                   vec![Err(create_error(LexicalErrorCode::ExpectedFloatExponent, 3))]);
+                   vec![
+                Err(create_error(LexicalErrorCode::ExpectedFloatExponent, 3)),
+            ]);
         assert_lex("1e+",
-                   vec![Err(create_error(LexicalErrorCode::ExpectedFloatExponent, 3))]);
+                   vec![
+                Err(create_error(LexicalErrorCode::ExpectedFloatExponent, 3)),
+            ]);
         assert_lex("1e-",
-                   vec![Err(create_error(LexicalErrorCode::ExpectedFloatExponent, 3))]);
+                   vec![
+                Err(create_error(LexicalErrorCode::ExpectedFloatExponent, 3)),
+            ]);
 
         // With leading decimal point
         assert_lex(".5", vec![Ok((0, Token::FloatLiteral(0.5), 2))]);
@@ -957,12 +976,16 @@ mod test {
         assert_lex("0x1234FF",
                    vec![Ok((0, Token::IntegerLiteral(0x1234FF), 8))]);
         assert_lex("0x",
-                   vec![Err(create_error(LexicalErrorCode::ExpectedHexadecimalDigit, 2))]);
+                   vec![
+                Err(create_error(LexicalErrorCode::ExpectedHexadecimalDigit, 2)),
+            ]);
         assert_lex("-0x0", vec![Ok((0, Token::IntegerLiteral(0x0), 4))]);
         assert_lex("-0x1234FF",
                    vec![Ok((0, Token::IntegerLiteral(-0x1234FF), 9))]);
         assert_lex("-0x",
-                   vec![Err(create_error(LexicalErrorCode::ExpectedHexadecimalDigit, 3))]);
+                   vec![
+                Err(create_error(LexicalErrorCode::ExpectedHexadecimalDigit, 3)),
+            ]);
 
         // Octal
         assert_lex("0", vec![Ok((0, Token::IntegerLiteral(0), 1))]);
@@ -971,11 +994,15 @@ mod test {
 
         // Octal integer literal followed by non-octal digits.
         assert_lex("08",
-                   vec![Ok((0, Token::IntegerLiteral(0), 1)),
-                        Ok((1, Token::IntegerLiteral(8), 2))]);
+                   vec![
+                Ok((0, Token::IntegerLiteral(0), 1)),
+                Ok((1, Token::IntegerLiteral(8), 2)),
+            ]);
         assert_lex("01238",
-                   vec![Ok((0, Token::IntegerLiteral(0o123), 4)),
-                        Ok((4, Token::IntegerLiteral(8), 5))]);
+                   vec![
+                Ok((0, Token::IntegerLiteral(0o123), 4)),
+                Ok((4, Token::IntegerLiteral(8), 5)),
+            ]);
     }
 
     #[test]
@@ -1067,7 +1094,10 @@ mod test {
     fn lex_negative_infinity() {
         assert_lex("-Infinity", vec![Ok((0, Token::NegativeInfinity, 9))]);
         assert_lex("-Infinity;",
-                   vec![Ok((0, Token::NegativeInfinity, 9)), Ok((9, Token::Semicolon, 10))]);
+                   vec![
+                Ok((0, Token::NegativeInfinity, 9)),
+                Ok((9, Token::Semicolon, 10)),
+            ]);
     }
 
     #[test]
@@ -1111,9 +1141,17 @@ mod test {
     #[test]
     fn lex_string() {
         assert_lex(r#""this is a string""#,
-                   vec![Ok((0, Token::StringLiteral("this is a string".to_string()), 18))]);
+                   vec![
+                Ok((
+                    0,
+                    Token::StringLiteral("this is a string".to_string()),
+                    18,
+                )),
+            ]);
         assert_lex(r#""this is a string"#,
-                   vec![Err(create_error(LexicalErrorCode::ExpectedStringLiteralEnd, 18))]);
+                   vec![
+                Err(create_error(LexicalErrorCode::ExpectedStringLiteralEnd, 18)),
+            ]);
     }
 
     #[test]
