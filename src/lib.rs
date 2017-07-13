@@ -13,7 +13,10 @@
 
 //! Contains a lexer for lexing the WebIDL grammar.
 
+#[macro_use]
+extern crate error_chain;
 extern crate lalrpop_util;
+extern crate petgraph;
 
 /// Contains lexer related structures and functions for lexing the WebIDL grammar.
 mod lexer;
