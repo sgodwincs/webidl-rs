@@ -1,6 +1,6 @@
 #[cfg_attr(rustfmt, rustfmt_skip)]
-#[allow(clippy)]
 #[allow(unknown_lints)]
+#[allow(clippy)]
 mod grammar;
 
 /// Contains all structures related to the AST for the WebIDL grammar.
