@@ -6,7 +6,7 @@
 
 A parser for [WebIDL](https://heycam.github.io/webidl/) in Rust.
 
-[Documentation](https://docs.rs/webidl/0.2.0/webidl/).
+[Documentation](https://docs.rs/webidl/)
 
 # Example
 
