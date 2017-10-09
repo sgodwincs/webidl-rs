@@ -73,7 +73,6 @@ ArgumentNameKeyword: ast::Identifier = {
     "inherit" => "inherit".to_string(),
     "interface" => "interface".to_string(),
     "iterable" => "iterable".to_string(),
-    "legacycaller" => "legacycaller".to_string(),
     "maplike" => "maplike".to_string(),
     "namespace" => "namespace".to_string(),
     "partial" => "partial".to_string(),
@@ -100,19 +99,19 @@ AttributeRest: (Box<ast::Type>, ast::Identifier) = {
 };
 
 BooleanLiteral: bool = {
-    "false" => false,
-    "true" => true
+    "true" => true,
+    "false" => false
 };
 
 BufferRelatedType: ast::BufferRelatedType = {
     "ArrayBuffer" => ast::BufferRelatedType::ArrayBuffer,
     "DataView" => ast::BufferRelatedType::DataView,
+    "Int8Array" => ast::BufferRelatedType::Int8Array,
     "Int16Array" => ast::BufferRelatedType::Int16Array,
     "Int32Array" => ast::BufferRelatedType::Int32Array,
-    "Int8Array" => ast::BufferRelatedType::Int8Array,
+    "Uint8Array" => ast::BufferRelatedType::Uint8Array,
     "Uint16Array" => ast::BufferRelatedType::Uint16Array,
     "Uint32Array" => ast::BufferRelatedType::Uint32Array,
-    "Uint8Array" => ast::BufferRelatedType::Uint8Array,
     "Uint8ClampedArray" => ast::BufferRelatedType::Uint8ClampedArray,
     "Float32Array" => ast::BufferRelatedType::Float32Array,
     "Float64Array" => ast::BufferRelatedType::Float64Array,
@@ -231,8 +230,8 @@ Definition: ast::Definition = {
         }))
     },
     Partial,
-    Enum => ast::Definition::Enum(<>),
     Dictionary => ast::Definition::Dictionary(<>),
+    Enum => ast::Definition::Enum(<>),
     Typedef => ast::Definition::Typedef(<>),
     ImplementsStatement => ast::Definition::Implements(<>),
 };
@@ -594,8 +593,8 @@ Interface: (ast::Identifier, Option<ast::Identifier>, Vec<ast::InterfaceMember>)
 InterfaceMember: ast::InterfaceMember = {
     Const => ast::InterfaceMember::Const(<>),
     Operation => ast::InterfaceMember::Operation(<>),
-    StaticMember,
     Stringifier,
+    StaticMember,
     Iterable => ast::InterfaceMember::Iterable(<>),
     ReadOnlyMember,
     ReadWriteAttribute => ast::InterfaceMember::Attribute(<>),
@@ -849,6 +848,13 @@ NonAnyType: Box<ast::Type> = {
             kind: ast::TypeKind::Object
         })
     },
+    "symbol" <nullable: Null> => {
+        Box::new(ast::Type {
+            extended_attributes: vec![],
+            nullable,
+            kind: ast::TypeKind::Symbol
+        })
+    },
     "Error" <nullable: Null> => {
         Box::new(ast::Type {
             extended_attributes: vec![],
@@ -951,7 +957,6 @@ Other: ast::Other = {
     "Int8Array" => ast::Other::Int8Array,
     "interface" => ast::Other::Interface,
     "iterable" => ast::Other::Iterable,
-    "legacycaller" => ast::Other::LegacyCaller,
     "long" => ast::Other::Long,
     "maplike" => ast::Other::Maplike,
     "namespace" => ast::Other::Namespace,
@@ -1041,8 +1046,8 @@ PartialInterface: ast::Interface = {
 };
 
 PrimitiveType: ast::PrimitiveType = {
-    UnrestrictedFloatType => ast::PrimitiveType::UnrestrictedFloat(<>),
     UnsignedIntegerType => ast::PrimitiveType::UnsignedInteger(<>),
+    UnrestrictedFloatType => ast::PrimitiveType::UnrestrictedFloat(<>),
     "boolean" => ast::PrimitiveType::Boolean,
     "byte" => ast::PrimitiveType::Byte,
     "octet" => ast::PrimitiveType::Octet
@@ -1159,10 +1164,9 @@ SpecialOperation: ast::Operation = {
 };
 
 Special: ast::Special = {
-    "deleter" => ast::Special::Deleter,
     "getter" => ast::Special::Getter,
-    "legacycaller" => ast::Special::LegacyCaller,
     "setter" => ast::Special::Setter,
+    "deleter" => ast::Special::Deleter
 };
 
 Specials: Vec<ast::Special> = {
@@ -1359,7 +1363,6 @@ extern {
         "Int8Array" => Token::Int8Array,
         "interface" => Token::Interface,
         "iterable" => Token::Iterable,
-        "legacycaller" => Token::LegacyCaller,
         "long" => Token::Long,
         "maplike" => Token::Maplike,
         "namespace" => Token::Namespace,
@@ -1382,6 +1385,7 @@ extern {
         "short" => Token::Short,
         "static" => Token::Static,
         "stringifier" => Token::Stringifier,
+        "symbol" => Token::Symbol,
         "true" => Token::True,
         "typedef" => Token::Typedef,
         "USVString" => Token::USVString,

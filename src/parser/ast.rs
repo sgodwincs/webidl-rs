@@ -320,7 +320,6 @@ pub enum Other {
     Int8Array,
     Interface,
     Iterable,
-    LegacyCaller,
     Long,
     Maplike,
     Namespace,
@@ -443,7 +442,6 @@ pub struct Setlike {
 pub enum Special {
     Deleter,
     Getter,
-    LegacyCaller,
     Setter,
 }
 
@@ -528,6 +526,7 @@ pub enum TypeKind {
     SignedLong,
     SignedLongLong,
     SignedShort,
+    Symbol,
     USVString,
     Uint16Array,
     Uint32Array,

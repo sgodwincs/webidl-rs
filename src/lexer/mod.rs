@@ -332,18 +332,16 @@ impl<'input> Lexer<'input> {
             previous += 1;
 
             match self.chars.next() {
-                Some((_, '*')) => {
-                    match self.chars.next() {
-                        Some((_, '/')) => break,
-                        Some(_) => continue,
-                        None => {
-                            return Some(Err(create_error(
-                                LexicalErrorCode::ExpectedCommentBlockEnd,
-                                previous + 1,
-                            )))
-                        }
+                Some((_, '*')) => match self.chars.next() {
+                    Some((_, '/')) => break,
+                    Some(_) => continue,
+                    None => {
+                        return Some(Err(create_error(
+                            LexicalErrorCode::ExpectedCommentBlockEnd,
+                            previous + 1,
+                        )))
                     }
-                }
+                },
                 Some(_) => continue,
                 None => {
                     return Some(Err(create_error(
@@ -383,123 +381,108 @@ impl<'input> Lexer<'input> {
     ) -> Option<<Self as Iterator>::Item> {
         loop {
             match float_lex_state {
-                FloatLexState::BeforeDecimalPoint => {
-                    match self.chars.peek() {
-                        Some(&(_, c @ '0'...'9')) => {
-                            self.push_next_char(&mut float_literal, c, &mut offset)
-                        }
-                        Some(&(_, 'e')) | Some(&(_, 'E')) => {
-                            self.push_next_char(&mut float_literal, 'e', &mut offset);
-                            float_lex_state = FloatLexState::ImmediatelyAfterExponentBase;
-                        }
-                        Some(&(_, '.')) => {
-                            self.push_next_char(&mut float_literal, '.', &mut offset);
-                            float_lex_state = FloatLexState::ImmediatelyAfterDecimalPoint;
-                        }
-                        _ => {
-                            panic!(
-                                "Integer literals should not be\
+                FloatLexState::BeforeDecimalPoint => match self.chars.peek() {
+                    Some(&(_, c @ '0'...'9')) => {
+                        self.push_next_char(&mut float_literal, c, &mut offset)
+                    }
+                    Some(&(_, 'e')) | Some(&(_, 'E')) => {
+                        self.push_next_char(&mut float_literal, 'e', &mut offset);
+                        float_lex_state = FloatLexState::ImmediatelyAfterExponentBase;
+                    }
+                    Some(&(_, '.')) => {
+                        self.push_next_char(&mut float_literal, '.', &mut offset);
+                        float_lex_state = FloatLexState::ImmediatelyAfterDecimalPoint;
+                    }
+                    _ => panic!(
+                        "Integer literals should not be\
                          able to be lexed as float literals"
-                            )
-                        }
+                    ),
+                },
+                FloatLexState::ImmediatelyAfterDecimalPoint => match self.chars.peek() {
+                    Some(&(_, c @ '0'...'9')) => {
+                        self.push_next_char(&mut float_literal, c, &mut offset);
+                        float_lex_state = FloatLexState::AfterDecimalPoint;
                     }
-                }
-                FloatLexState::ImmediatelyAfterDecimalPoint => {
-                    match self.chars.peek() {
-                        Some(&(_, c @ '0'...'9')) => {
-                            self.push_next_char(&mut float_literal, c, &mut offset);
-                            float_lex_state = FloatLexState::AfterDecimalPoint;
-                        }
-                        Some(&(_, 'e')) | Some(&(_, 'E')) => {
-                            if float_literal.chars().count() == 1 {
-                                panic!(
-                                    "A leading decimal point followed by\
+                    Some(&(_, 'e')) | Some(&(_, 'E')) => {
+                        if float_literal.chars().count() == 1 {
+                            panic!(
+                                "A leading decimal point followed by\
                                  an exponent should not be possible"
-                                );
-                            }
+                            );
+                        }
 
-                            self.push_next_char(&mut float_literal, 'e', &mut offset);
-                            float_lex_state = FloatLexState::ImmediatelyAfterExponentBase;
-                        }
-                        _ if float_literal.starts_with("-.") => {
-                            return Some(Err(
-                                create_error(LexicalErrorCode::ExpectedDecimalDigit, offset),
-                            ))
-                        }
-                        _ => {
-                            return Some(Ok((
-                                start,
-                                Token::FloatLiteral(float_literal.parse().unwrap()),
-                                offset,
-                            )));
-                        }
+                        self.push_next_char(&mut float_literal, 'e', &mut offset);
+                        float_lex_state = FloatLexState::ImmediatelyAfterExponentBase;
                     }
-                }
-                FloatLexState::AfterDecimalPoint => {
-                    match self.chars.peek() {
-                        Some(&(_, c @ '0'...'9')) => {
-                            self.push_next_char(&mut float_literal, c, &mut offset);
-                        }
-                        Some(&(_, 'e')) | Some(&(_, 'E')) => {
-                            self.push_next_char(&mut float_literal, 'e', &mut offset);
-                            float_lex_state = FloatLexState::ImmediatelyAfterExponentBase;
-                        }
-                        _ => {
-                            return Some(Ok((
-                                start,
-                                Token::FloatLiteral(float_literal.parse().unwrap()),
-                                offset,
-                            )));
-                        }
+                    _ if float_literal.starts_with("-.") => {
+                        return Some(Err(
+                            create_error(LexicalErrorCode::ExpectedDecimalDigit, offset),
+                        ))
                     }
-                }
-                FloatLexState::ImmediatelyAfterExponentBase => {
-                    match self.chars.peek() {
-                        Some(&(_, c @ '0'...'9')) => {
-                            self.push_next_char(&mut float_literal, c, &mut offset);
-                            float_lex_state = FloatLexState::AfterExponentBase;
-                        }
-                        Some(&(_, c @ '+')) |
-                        Some(&(_, c @ '-')) => {
-                            self.push_next_char(&mut float_literal, c, &mut offset);
-                            float_lex_state = FloatLexState::ImmediatelyAfterExponentSign;
-                        }
-                        _ => {
-                            return Some(Err(create_error(
-                                LexicalErrorCode::ExpectedFloatExponent,
-                                offset,
-                            )))
-                        }
+                    _ => {
+                        return Some(Ok((
+                            start,
+                            Token::FloatLiteral(float_literal.parse().unwrap()),
+                            offset,
+                        )));
                     }
-                }
-                FloatLexState::ImmediatelyAfterExponentSign => {
-                    match self.chars.peek() {
-                        Some(&(_, c @ '0'...'9')) => {
-                            self.push_next_char(&mut float_literal, c, &mut offset);
-                            float_lex_state = FloatLexState::AfterExponentBase;
-                        }
-                        _ => {
-                            return Some(Err(create_error(
-                                LexicalErrorCode::ExpectedFloatExponent,
-                                offset,
-                            )))
-                        }
+                },
+                FloatLexState::AfterDecimalPoint => match self.chars.peek() {
+                    Some(&(_, c @ '0'...'9')) => {
+                        self.push_next_char(&mut float_literal, c, &mut offset);
                     }
-                }
-                FloatLexState::AfterExponentBase => {
-                    match self.chars.peek() {
-                        Some(&(_, c @ '0'...'9')) => {
-                            self.push_next_char(&mut float_literal, c, &mut offset);
-                        }
-                        _ => {
-                            return Some(Ok((
-                                start,
-                                Token::FloatLiteral(float_literal.parse().unwrap()),
-                                offset,
-                            )));
-                        }
+                    Some(&(_, 'e')) | Some(&(_, 'E')) => {
+                        self.push_next_char(&mut float_literal, 'e', &mut offset);
+                        float_lex_state = FloatLexState::ImmediatelyAfterExponentBase;
                     }
-                }
+                    _ => {
+                        return Some(Ok((
+                            start,
+                            Token::FloatLiteral(float_literal.parse().unwrap()),
+                            offset,
+                        )));
+                    }
+                },
+                FloatLexState::ImmediatelyAfterExponentBase => match self.chars.peek() {
+                    Some(&(_, c @ '0'...'9')) => {
+                        self.push_next_char(&mut float_literal, c, &mut offset);
+                        float_lex_state = FloatLexState::AfterExponentBase;
+                    }
+                    Some(&(_, c @ '+')) | Some(&(_, c @ '-')) => {
+                        self.push_next_char(&mut float_literal, c, &mut offset);
+                        float_lex_state = FloatLexState::ImmediatelyAfterExponentSign;
+                    }
+                    _ => {
+                        return Some(Err(create_error(
+                            LexicalErrorCode::ExpectedFloatExponent,
+                            offset,
+                        )))
+                    }
+                },
+                FloatLexState::ImmediatelyAfterExponentSign => match self.chars.peek() {
+                    Some(&(_, c @ '0'...'9')) => {
+                        self.push_next_char(&mut float_literal, c, &mut offset);
+                        float_lex_state = FloatLexState::AfterExponentBase;
+                    }
+                    _ => {
+                        return Some(Err(create_error(
+                            LexicalErrorCode::ExpectedFloatExponent,
+                            offset,
+                        )))
+                    }
+                },
+                FloatLexState::AfterExponentBase => match self.chars.peek() {
+                    Some(&(_, c @ '0'...'9')) => {
+                        self.push_next_char(&mut float_literal, c, &mut offset);
+                    }
+                    _ => {
+                        return Some(Ok((
+                            start,
+                            Token::FloatLiteral(float_literal.parse().unwrap()),
+                            offset,
+                        )));
+                    }
+                },
             }
         }
     }
@@ -516,22 +499,20 @@ impl<'input> Lexer<'input> {
         self.chars.next();
 
         match self.chars.peek() {
-            Some(&(_, c)) if c.is_digit(16) => {
-                loop {
-                    match self.chars.peek() {
-                        Some(&(_, c)) if c.is_digit(16) => {
-                            self.push_next_char(&mut hexadecimal_literal, c, &mut offset);
-                        }
-                        _ => {
-                            let hexadecimal_literal =
-                                i64::from_str_radix(&*hexadecimal_literal, 16).unwrap();
-                            return Some(Ok(
-                                (start, Token::IntegerLiteral(hexadecimal_literal), offset),
-                            ));
-                        }
+            Some(&(_, c)) if c.is_digit(16) => loop {
+                match self.chars.peek() {
+                    Some(&(_, c)) if c.is_digit(16) => {
+                        self.push_next_char(&mut hexadecimal_literal, c, &mut offset);
+                    }
+                    _ => {
+                        let hexadecimal_literal =
+                            i64::from_str_radix(&*hexadecimal_literal, 16).unwrap();
+                        return Some(Ok(
+                            (start, Token::IntegerLiteral(hexadecimal_literal), offset),
+                        ));
                     }
                 }
-            }
+            },
             _ => Some(Err(create_error(
                 LexicalErrorCode::ExpectedHexadecimalDigit,
                 offset,
@@ -603,7 +584,6 @@ impl<'input> Lexer<'input> {
             "inherit" => Token::Inherit,
             "interface" => Token::Interface,
             "iterable" => Token::Iterable,
-            "legacycaller" => Token::LegacyCaller,
             "long" => Token::Long,
             "maplike" => Token::Maplike,
             "namespace" => Token::Namespace,
@@ -622,18 +602,17 @@ impl<'input> Lexer<'input> {
             "short" => Token::Short,
             "static" => Token::Static,
             "stringifier" => Token::Stringifier,
+            "symbol" => Token::Symbol,
             "typedef" => Token::Typedef,
             "true" => Token::True,
             "unrestricted" => Token::Unrestricted,
             "unsigned" => Token::Unsigned,
             "void" => Token::Void,
-            _ => {
-                if identifier.starts_with('_') {
-                    Token::Identifier(identifier.split_at(1).1.to_string())
-                } else {
-                    Token::Identifier(identifier)
-                }
-            }
+            _ => if identifier.starts_with('_') {
+                Token::Identifier(identifier.split_at(1).1.to_string())
+            } else {
+                Token::Identifier(identifier)
+            },
         };
 
         Some(Ok((start, token, offset)))
@@ -649,114 +628,109 @@ impl<'input> Lexer<'input> {
         c: char,
     ) -> Option<<Self as Iterator>::Item> {
         match c {
-            '0' => {
-                match self.chars.peek() {
-                    Some(&(_, 'x')) | Some(&(_, 'X')) => {
-                        self.lex_hexadecimal_literal(start, offset, literal)
-                    }
-                    Some(&(_, c @ '0'...'9')) => {
-                        offset += 2;
-                        literal.push(c);
+            '0' => match self.chars.peek() {
+                Some(&(_, 'x')) | Some(&(_, 'X')) => {
+                    self.lex_hexadecimal_literal(start, offset, literal)
+                }
+                Some(&(_, c @ '0'...'9')) => {
+                    offset += 2;
+                    literal.push(c);
 
-                        if c > '7' {
-                            if !self.lookahead_for_decimal_point() {
-                                return Some(Ok((start, Token::IntegerLiteral(0), offset - 1)));
-                            }
-
-                            self.chars.next();
-                            return self.lex_float_literal(
-                                start,
-                                offset,
-                                literal,
-                                FloatLexState::BeforeDecimalPoint,
-                            );
+                    if c > '7' {
+                        if !self.lookahead_for_decimal_point() {
+                            return Some(Ok((start, Token::IntegerLiteral(0), offset - 1)));
                         }
 
                         self.chars.next();
+                        return self.lex_float_literal(
+                            start,
+                            offset,
+                            literal,
+                            FloatLexState::BeforeDecimalPoint,
+                        );
+                    }
 
-                        loop {
-                            match self.chars.peek() {
-                                Some(&(_, c @ '0'...'9')) => {
-                                    if c > '7' {
-                                        if !self.lookahead_for_decimal_point() {
-                                            let literal = i64::from_str_radix(&*literal, 8)
-                                                .unwrap();
-                                            return Some(Ok(
-                                                (start, Token::IntegerLiteral(literal), offset),
-                                            ));
-                                        }
+                    self.chars.next();
 
-                                        self.push_next_char(&mut literal, c, &mut offset);
-
-                                        return self.lex_float_literal(
-                                            start,
-                                            offset,
-                                            literal,
-                                            FloatLexState::BeforeDecimalPoint,
+                    loop {
+                        match self.chars.peek() {
+                            Some(&(_, c @ '0'...'9')) => {
+                                if c > '7' {
+                                    if !self.lookahead_for_decimal_point() {
+                                        let literal = i64::from_str_radix(&*literal, 8).unwrap();
+                                        return Some(
+                                            Ok((start, Token::IntegerLiteral(literal), offset)),
                                         );
                                     }
 
                                     self.push_next_char(&mut literal, c, &mut offset);
 
-                                    if c > '7' {
-                                        return self.lex_float_literal(
-                                            start,
-                                            offset,
-                                            literal,
-                                            FloatLexState::BeforeDecimalPoint,
-                                        );
-                                    }
-                                }
-                                Some(&(_, '.')) => {
-                                    self.push_next_char(&mut literal, '.', &mut offset);
-
                                     return self.lex_float_literal(
                                         start,
                                         offset,
                                         literal,
-                                        FloatLexState::ImmediatelyAfterDecimalPoint,
+                                        FloatLexState::BeforeDecimalPoint,
                                     );
                                 }
-                                Some(&(_, 'e')) | Some(&(_, 'E')) => {
-                                    self.push_next_char(&mut literal, 'e', &mut offset);
 
+                                self.push_next_char(&mut literal, c, &mut offset);
+
+                                if c > '7' {
                                     return self.lex_float_literal(
                                         start,
                                         offset,
                                         literal,
-                                        FloatLexState::ImmediatelyAfterExponentBase,
-                                    );
-                                }
-                                _ => {
-                                    let literal = i64::from_str_radix(&*literal, 8).unwrap();
-                                    return Some(
-                                        Ok((start, Token::IntegerLiteral(literal), offset)),
+                                        FloatLexState::BeforeDecimalPoint,
                                     );
                                 }
                             }
+                            Some(&(_, '.')) => {
+                                self.push_next_char(&mut literal, '.', &mut offset);
+
+                                return self.lex_float_literal(
+                                    start,
+                                    offset,
+                                    literal,
+                                    FloatLexState::ImmediatelyAfterDecimalPoint,
+                                );
+                            }
+                            Some(&(_, 'e')) | Some(&(_, 'E')) => {
+                                self.push_next_char(&mut literal, 'e', &mut offset);
+
+                                return self.lex_float_literal(
+                                    start,
+                                    offset,
+                                    literal,
+                                    FloatLexState::ImmediatelyAfterExponentBase,
+                                );
+                            }
+                            _ => {
+                                let literal = i64::from_str_radix(&*literal, 8).unwrap();
+                                return Some(Ok((start, Token::IntegerLiteral(literal), offset)));
+                            }
                         }
                     }
-                    Some(&(_, '.')) => {
-                        self.chars.next();
-                        self.lex_float_literal(
-                            start,
-                            start + 2,
-                            "0.".to_string(),
-                            FloatLexState::ImmediatelyAfterDecimalPoint,
-                        )
-                    }
-                    Some(&(_, 'e')) | Some(&(_, 'E')) => {
-                        self.chars.next();
-                        self.lex_float_literal(
-                            start,
-                            start + 2,
-                            "0e".to_string(),
-                            FloatLexState::ImmediatelyAfterExponentBase,
-                        )
-                    }
-                    _ => Some(Ok((start, Token::IntegerLiteral(0), start + 1))),
                 }
-            }
+                Some(&(_, '.')) => {
+                    self.chars.next();
+                    self.lex_float_literal(
+                        start,
+                        start + 2,
+                        "0.".to_string(),
+                        FloatLexState::ImmediatelyAfterDecimalPoint,
+                    )
+                }
+                Some(&(_, 'e')) | Some(&(_, 'E')) => {
+                    self.chars.next();
+                    self.lex_float_literal(
+                        start,
+                        start + 2,
+                        "0e".to_string(),
+                        FloatLexState::ImmediatelyAfterExponentBase,
+                    )
+                }
+                _ => Some(Ok((start, Token::IntegerLiteral(0), start + 1))),
+            },
             c => {
                 literal.push(c);
                 offset += 1;
@@ -1154,7 +1128,6 @@ mod test {
         assert_lex("inherit", vec![Ok((0, Token::Inherit, 7))]);
         assert_lex("interface", vec![Ok((0, Token::Interface, 9))]);
         assert_lex("iterable", vec![Ok((0, Token::Iterable, 8))]);
-        assert_lex("legacycaller", vec![Ok((0, Token::LegacyCaller, 12))]);
         assert_lex("long", vec![Ok((0, Token::Long, 4))]);
         assert_lex("maplike", vec![Ok((0, Token::Maplike, 7))]);
         assert_lex("namespace", vec![Ok((0, Token::Namespace, 9))]);
@@ -1173,6 +1146,7 @@ mod test {
         assert_lex("short", vec![Ok((0, Token::Short, 5))]);
         assert_lex("static", vec![Ok((0, Token::Static, 6))]);
         assert_lex("stringifier", vec![Ok((0, Token::Stringifier, 11))]);
+        assert_lex("symbol", vec![Ok((0, Token::Symbol, 6))]);
         assert_lex("true", vec![Ok((0, Token::True, 4))]);
         assert_lex("typedef", vec![Ok((0, Token::Typedef, 7))]);
         assert_lex("unsigned", vec![Ok((0, Token::Unsigned, 8))]);

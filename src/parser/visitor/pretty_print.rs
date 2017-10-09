@@ -41,7 +41,9 @@ pub struct PrettyPrintVisitor {
 
 impl PrettyPrintVisitor {
     pub fn new() -> Self {
-        PrettyPrintVisitor { output: String::new() }
+        PrettyPrintVisitor {
+            output: String::new(),
+        }
     }
 
     pub fn get_output(&self) -> &String {
@@ -88,18 +90,14 @@ impl PrettyPrintVisitor {
 
             if let Some(next_member) = iterator.peek() {
                 match *member {
-                    NamespaceMember::Attribute(_) => {
-                        match **next_member {
-                            NamespaceMember::Attribute(_) => (),
-                            _ => self.output.push('\n'),
-                        }
-                    }
-                    NamespaceMember::Operation(_) => {
-                        match **next_member {
-                            NamespaceMember::Operation(_) => (),
-                            _ => self.output.push('\n'),
-                        }
-                    }
+                    NamespaceMember::Attribute(_) => match **next_member {
+                        NamespaceMember::Attribute(_) => (),
+                        _ => self.output.push('\n'),
+                    },
+                    NamespaceMember::Operation(_) => match **next_member {
+                        NamespaceMember::Operation(_) => (),
+                        _ => self.output.push('\n'),
+                    },
                 }
             }
         }
@@ -131,42 +129,30 @@ impl PrettyPrintVisitor {
 
             if let Some(next_member) = iterator.peek() {
                 match *member {
-                    InterfaceMember::Attribute(_) => {
-                        match **next_member {
-                            InterfaceMember::Attribute(_) => (),
-                            _ => self.output.push('\n'),
-                        }
-                    }
-                    InterfaceMember::Const(_) => {
-                        match **next_member {
-                            InterfaceMember::Const(_) => (),
-                            _ => self.output.push('\n'),
-                        }
-                    }
-                    InterfaceMember::Iterable(_) => {
-                        match **next_member {
-                            InterfaceMember::Iterable(_) => (),
-                            _ => self.output.push('\n'),
-                        }
-                    }
-                    InterfaceMember::Maplike(_) => {
-                        match **next_member {
-                            InterfaceMember::Maplike(_) => (),
-                            _ => self.output.push('\n'),
-                        }
-                    }
-                    InterfaceMember::Operation(_) => {
-                        match **next_member {
-                            InterfaceMember::Operation(_) => (),
-                            _ => self.output.push('\n'),
-                        }
-                    }
-                    InterfaceMember::Setlike(_) => {
-                        match **next_member {
-                            InterfaceMember::Setlike(_) => (),
-                            _ => self.output.push('\n'),
-                        }
-                    }
+                    InterfaceMember::Attribute(_) => match **next_member {
+                        InterfaceMember::Attribute(_) => (),
+                        _ => self.output.push('\n'),
+                    },
+                    InterfaceMember::Const(_) => match **next_member {
+                        InterfaceMember::Const(_) => (),
+                        _ => self.output.push('\n'),
+                    },
+                    InterfaceMember::Iterable(_) => match **next_member {
+                        InterfaceMember::Iterable(_) => (),
+                        _ => self.output.push('\n'),
+                    },
+                    InterfaceMember::Maplike(_) => match **next_member {
+                        InterfaceMember::Maplike(_) => (),
+                        _ => self.output.push('\n'),
+                    },
+                    InterfaceMember::Operation(_) => match **next_member {
+                        InterfaceMember::Operation(_) => (),
+                        _ => self.output.push('\n'),
+                    },
+                    InterfaceMember::Setlike(_) => match **next_member {
+                        InterfaceMember::Setlike(_) => (),
+                        _ => self.output.push('\n'),
+                    },
                 }
             }
         }
@@ -182,24 +168,18 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
 
             if let Some(next_definition) = iterator.peek() {
                 match *definition {
-                    Definition::Callback(_) => {
-                        match **next_definition {
-                            Definition::Callback(_) => (),
-                            _ => self.output.push('\n'),
-                        }
-                    }
-                    Definition::Implements(_) => {
-                        match **next_definition {
-                            Definition::Implements(_) => (),
-                            _ => self.output.push('\n'),
-                        }
-                    }
-                    Definition::Typedef(_) => {
-                        match **next_definition {
-                            Definition::Typedef(_) => (),
-                            _ => self.output.push('\n'),
-                        }
-                    }
+                    Definition::Callback(_) => match **next_definition {
+                        Definition::Callback(_) => (),
+                        _ => self.output.push('\n'),
+                    },
+                    Definition::Implements(_) => match **next_definition {
+                        Definition::Implements(_) => (),
+                        _ => self.output.push('\n'),
+                    },
+                    Definition::Typedef(_) => match **next_definition {
+                        Definition::Typedef(_) => (),
+                        _ => self.output.push('\n'),
+                    },
                     _ => (),
                 }
             }
@@ -440,7 +420,6 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
             "Int8Array" => "_Int8Array",
             "interface" => "_interface",
             "iterable" => "_iterable",
-            "legacycaller" => "_legacycaller",
             "long" => "_long",
             "maplike" => "_maplike",
             "namespace" => "_namespace",
@@ -462,6 +441,7 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
             "short" => "_short",
             "static" => "_static",
             "stringifier" => "_stringifier",
+            "symbol" => "_symbol",
             "true" => "_true",
             "typedef" => "_typedef",
             "USVString" => "_USVString",
@@ -662,7 +642,6 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
             Other::Int8Array => self.output.push_str("Int8Array"),
             Other::Interface => self.output.push_str("interface"),
             Other::Iterable => self.output.push_str("iterable"),
-            Other::LegacyCaller => self.output.push_str("legacycaller"),
             Other::Long => self.output.push_str("long"),
             Other::Maplike => self.output.push_str("maplike"),
             Other::Namespace => self.output.push_str("namespace"),
@@ -881,7 +860,6 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
         match *special {
             Special::Deleter => self.output.push_str("deleter"),
             Special::Getter => self.output.push_str("getter"),
-            Special::LegacyCaller => self.output.push_str("legacycaller"),
             Special::Setter => self.output.push_str("setter"),
         }
     }
@@ -1037,6 +1015,7 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
             TypeKind::SignedLong => self.output.push_str("long"),
             TypeKind::SignedLongLong => self.output.push_str("long long"),
             TypeKind::SignedShort => self.output.push_str("short"),
+            TypeKind::Symbol => self.output.push_str("symbol"),
             TypeKind::USVString => self.output.push_str("USVString"),
             TypeKind::Uint16Array => self.output.push_str("Uint16Array"),
             TypeKind::Uint32Array => self.output.push_str("Uint32Array"),
