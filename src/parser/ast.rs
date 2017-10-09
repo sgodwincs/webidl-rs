@@ -560,23 +560,29 @@ mod test {
 
     #[test]
     fn test_flatten_asts() {
-        let ast1 = vec![Definition::Interface(Interface::NonPartial(NonPartialInterface {
-                                                                        extended_attributes: vec![],
-                                                                        inherits: None,
-                                                                        members: vec![],
-                                                                        name: "Node".to_string(),
-                                                                    }))];
-        let ast2 = vec![Definition::Typedef(Typedef {
-                                                extended_attributes: vec![],
-                                                name: "Typedef".to_string(),
-                                                type_: Box::new(Type {
-                                                                    extended_attributes: vec![],
-                                                                    kind: TypeKind::Any,
-                                                                    nullable: false,
-                                                                }),
-                                            })];
+        let ast1 = vec![
+            Definition::Interface(Interface::NonPartial(NonPartialInterface {
+                extended_attributes: vec![],
+                inherits: None,
+                members: vec![],
+                name: "Node".to_string(),
+            })),
+        ];
+        let ast2 = vec![
+            Definition::Typedef(Typedef {
+                extended_attributes: vec![],
+                name: "Typedef".to_string(),
+                type_: Box::new(Type {
+                    extended_attributes: vec![],
+                    kind: TypeKind::Any,
+                    nullable: false,
+                }),
+            }),
+        ];
 
-        assert_eq!(flatten_asts(vec![ast1.clone(), ast2.clone()]),
-                   vec![ast1[0].clone(), ast2[0].clone()]);
+        assert_eq!(
+            flatten_asts(vec![ast1.clone(), ast2.clone()]),
+            vec![ast1[0].clone(), ast2[0].clone()]
+        );
     }
 }

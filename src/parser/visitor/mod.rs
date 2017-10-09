@@ -9,6 +9,7 @@ pub use self::pretty_print::PrettyPrintVisitor;
 
 macro_rules! make_visitor {
     ($visitor_trait_name:ident, $($mutability:ident)*) => {
+        #[cfg_attr(rustfmt, rustfmt_skip)]
         pub trait $visitor_trait_name<'ast> {
             // Override the following functions. The `walk` functions are the default behavior.
 
@@ -24,8 +25,10 @@ macro_rules! make_visitor {
                 self.walk_argument(argument);
             }
 
-            fn visit_argument_list_extended_attribute(&mut self,
-                                                      ex: &'ast $($mutability)* ArgumentListExtendedAttribute) {
+            fn visit_argument_list_extended_attribute(
+                &mut self,
+                ex: &'ast $($mutability)* ArgumentListExtendedAttribute)
+            {
                 self.walk_argument_list_extended_attribute(ex);
             }
 
@@ -37,8 +40,10 @@ macro_rules! make_visitor {
                 self.walk_callback(callback);
             }
 
-            fn visit_callback_interface(&mut self,
-                                        callback_interface: &'ast $($mutability)* CallbackInterface) {
+            fn visit_callback_interface(
+                &mut self,
+                callback_interface: &'ast $($mutability)* CallbackInterface)
+            {
                 self.walk_callback_interface(callback_interface);
             }
 
@@ -73,8 +78,10 @@ macro_rules! make_visitor {
                 self.walk_enum(enum_);
             }
 
-            fn visit_explicit_stringifier_operation(&mut self,
-                                                    op: &'ast $($mutability)* ExplicitStringifierOperation) {
+            fn visit_explicit_stringifier_operation(
+                &mut self,
+                op: &'ast $($mutability)* ExplicitStringifierOperation)
+            {
                 self.walk_explicit_stringifier_operation(op);
             }
 
@@ -85,13 +92,17 @@ macro_rules! make_visitor {
 
             fn visit_identifier(&mut self, _identifier: &'ast $($mutability)* str) {}
 
-            fn visit_identifier_extended_attribute(&mut self,
-                                                   ex: &'ast $($mutability)* IdentifierExtendedAttribute) {
+            fn visit_identifier_extended_attribute(
+                &mut self,
+                ex: &'ast $($mutability)* IdentifierExtendedAttribute)
+            {
                 self.walk_identifier_extended_attribute(ex);
             }
 
-            fn visit_identifier_list_extended_attribute(&mut self,
-                                                        ex: &'ast $($mutability)* IdentifierListExtendedAttribute) {
+            fn visit_identifier_list_extended_attribute(
+                &mut self,
+                ex: &'ast $($mutability)* IdentifierListExtendedAttribute)
+            {
                 self.walk_identifier_list_extended_attribute(ex);
             }
 
@@ -99,8 +110,10 @@ macro_rules! make_visitor {
                 self.walk_implements(implements);
             }
 
-            fn visit_implicit_stringifier_operation(&mut self,
-                                                    op: &'ast $($mutability)* ImplicitStringifierOperation) {
+            fn visit_implicit_stringifier_operation(
+                &mut self,
+                op: &'ast $($mutability)* ImplicitStringifierOperation)
+            {
                 self.walk_implicit_stringifier_operation(op);
             }
 
@@ -121,8 +134,10 @@ macro_rules! make_visitor {
                 self.walk_maplike(maplike);
             }
 
-            fn visit_named_argument_list_extended_attribute(&mut self,
-                                                            ex: &'ast $($mutability)* NamedArgumentListExtendedAttribute) {
+            fn visit_named_argument_list_extended_attribute(
+                &mut self,
+                ex: &'ast $($mutability)* NamedArgumentListExtendedAttribute)
+            {
                 self.walk_named_argument_list_extended_attribute(ex);
             }
 
@@ -135,8 +150,10 @@ macro_rules! make_visitor {
                 self.walk_namespace_member(namespace_member);
             }
 
-            fn visit_non_partial_dictionary(&mut self,
-                                            dictionary: &'ast $($mutability)* NonPartialDictionary) {
+            fn visit_non_partial_dictionary(
+                &mut self,
+                dictionary: &'ast $($mutability)* NonPartialDictionary)
+            {
                 self.walk_non_partial_dictionary(dictionary);
             }
 
@@ -252,8 +269,9 @@ macro_rules! make_visitor {
                 }
             }
 
-            fn walk_argument_list_extended_attribute(&mut self,
-                                                     ex: &'ast $($mutability)* ArgumentListExtendedAttribute)
+            fn walk_argument_list_extended_attribute(
+                &mut self,
+                ex: &'ast $($mutability)* ArgumentListExtendedAttribute)
             {
                 self.visit_identifier(&$($mutability)* ex.name);
 
@@ -389,8 +407,9 @@ macro_rules! make_visitor {
                 self.visit_identifier(&$($mutability)* enum_.name);
             }
 
-            fn walk_explicit_stringifier_operation(&mut self,
-                                                   op: &'ast $($mutability)* ExplicitStringifierOperation)
+            fn walk_explicit_stringifier_operation(
+                &mut self,
+                op: &'ast $($mutability)* ExplicitStringifierOperation)
             {
                 for extended_attribute in &$($mutability)* op.extended_attributes {
                     self.visit_extended_attribute(extended_attribute);
@@ -410,34 +429,38 @@ macro_rules! make_visitor {
             fn walk_extended_attribute(&mut self,
                                        ex: &'ast $($mutability)* ExtendedAttribute)
             {
+                use ast::ExtendedAttribute::*;
+
                 match *ex {
-                    ExtendedAttribute::ArgumentList(ref $($mutability)* extended_attribute) => {
+                    ArgumentList(ref $($mutability)* extended_attribute) => {
                         self.visit_argument_list_extended_attribute(extended_attribute);
                     }
-                    ExtendedAttribute::Identifier(ref $($mutability)* extended_attribute) => {
+                    Identifier(ref $($mutability)* extended_attribute) => {
                         self.visit_identifier_extended_attribute(extended_attribute);
                     }
-                    ExtendedAttribute::IdentifierList(ref $($mutability)* extended_attribute) => {
+                    IdentifierList(ref $($mutability)* extended_attribute) => {
                         self.visit_identifier_list_extended_attribute(extended_attribute);
                     }
-                    ExtendedAttribute::NamedArgumentList(ref $($mutability)* extended_attribute) => {
+                    NamedArgumentList(ref $($mutability)* extended_attribute) => {
                         self.visit_named_argument_list_extended_attribute(extended_attribute);
                     }
-                    ExtendedAttribute::NoArguments(ref $($mutability)* extended_attribute) => {
+                    NoArguments(ref $($mutability)* extended_attribute) => {
                         self.visit_other(extended_attribute);
                     }
                 }
             }
 
-            fn walk_identifier_extended_attribute(&mut self,
-                                                  ex: &'ast $($mutability)* IdentifierExtendedAttribute)
+            fn walk_identifier_extended_attribute(
+                &mut self,
+                ex: &'ast $($mutability)* IdentifierExtendedAttribute)
             {
                 self.visit_identifier(&$($mutability)* ex.lhs);
                 self.visit_other(&$($mutability)* ex.rhs);
             }
 
-            fn walk_identifier_list_extended_attribute(&mut self,
-                                                       ex: &'ast $($mutability)* IdentifierListExtendedAttribute)
+            fn walk_identifier_list_extended_attribute(
+                &mut self,
+                ex: &'ast $($mutability)* IdentifierListExtendedAttribute)
             {
                 self.visit_identifier(&$($mutability)* ex.lhs);
 
@@ -455,8 +478,9 @@ macro_rules! make_visitor {
                 self.visit_identifier(&$($mutability)* implements.implementee);
             }
 
-            fn walk_implicit_stringifier_operation(&mut self,
-                                                   op: &'ast $($mutability)* ImplicitStringifierOperation)
+            fn walk_implicit_stringifier_operation(
+                &mut self,
+                op: &'ast $($mutability)* ImplicitStringifierOperation)
             {
                 for extended_attribute in &$($mutability)* op.extended_attributes {
                     self.visit_extended_attribute(extended_attribute);
@@ -522,8 +546,9 @@ macro_rules! make_visitor {
                 self.visit_type(&$($mutability)* maplike.value_type);
             }
 
-            fn walk_named_argument_list_extended_attribute(&mut self,
-                                                           ex: &'ast $($mutability)* NamedArgumentListExtendedAttribute)
+            fn walk_named_argument_list_extended_attribute(
+                &mut self,
+                ex: &'ast $($mutability)* NamedArgumentListExtendedAttribute)
             {
                 self.visit_identifier(&$($mutability)* ex.lhs_name);
                 self.visit_identifier(&$($mutability)* ex.rhs_name);
@@ -556,52 +581,55 @@ macro_rules! make_visitor {
                 }
             }
 
-            fn walk_non_partial_dictionary(&mut self,
-                                           non_partial_dictionary: &'ast $($mutability)* NonPartialDictionary)
+            fn walk_non_partial_dictionary(
+                &mut self,
+                dictionary: &'ast $($mutability)* NonPartialDictionary)
             {
-                for extended_attribute in &$($mutability)* non_partial_dictionary.extended_attributes {
+                for extended_attribute in &$($mutability)* dictionary.extended_attributes {
                     self.visit_extended_attribute(extended_attribute);
                 }
 
-                self.visit_identifier(&$($mutability)* non_partial_dictionary.name);
+                self.visit_identifier(&$($mutability)* dictionary.name);
 
-                if let Some(ref $($mutability)* inherits) = non_partial_dictionary.inherits {
+                if let Some(ref $($mutability)* inherits) = dictionary.inherits {
                     self.visit_identifier(inherits);
                 }
 
-                for member in &$($mutability)* non_partial_dictionary.members {
+                for member in &$($mutability)* dictionary.members {
                     self.visit_dictionary_member(member);
                 }
             }
 
-            fn walk_non_partial_interface(&mut self,
-                                          non_partial_interface: &'ast $($mutability)* NonPartialInterface)
+            fn walk_non_partial_interface(
+                &mut self,
+                interface: &'ast $($mutability)* NonPartialInterface)
             {
-                for extended_attribute in &$($mutability)* non_partial_interface.extended_attributes {
+                for extended_attribute in &$($mutability)* interface.extended_attributes {
                     self.visit_extended_attribute(extended_attribute);
                 }
 
-                self.visit_identifier(&$($mutability)* non_partial_interface.name);
+                self.visit_identifier(&$($mutability)* interface.name);
 
-                if let Some(ref $($mutability)* inherits) = non_partial_interface.inherits {
+                if let Some(ref $($mutability)* inherits) = interface.inherits {
                     self.visit_identifier(inherits);
                 }
 
-                for member in &$($mutability)* non_partial_interface.members {
+                for member in &$($mutability)* interface.members {
                     self.visit_interface_member(member);
                 }
             }
 
-            fn walk_non_partial_namespace(&mut self,
-                                          non_partial_namespace: &'ast $($mutability)* NonPartialNamespace)
+            fn walk_non_partial_namespace(
+                &mut self,
+                namespace: &'ast $($mutability)* NonPartialNamespace)
             {
-                for extended_attribute in &$($mutability)* non_partial_namespace.extended_attributes {
+                for extended_attribute in &$($mutability)* namespace.extended_attributes {
                     self.visit_extended_attribute(extended_attribute);
                 }
 
-                self.visit_identifier(&$($mutability)* non_partial_namespace.name);
+                self.visit_identifier(&$($mutability)* namespace.name);
 
-                for member in &$($mutability)* non_partial_namespace.members {
+                for member in &$($mutability)* namespace.members {
                     self.visit_namespace_member(member);
                 }
             }
@@ -798,19 +826,21 @@ macro_rules! make_visitor {
                 }
             }
 
-            fn walk_stringifier_attribute(&mut self,
-                                          stringifier_attribute: &'ast $($mutability)* StringifierAttribute)
+            fn walk_stringifier_attribute(
+                &mut self,
+                attribute: &'ast $($mutability)* StringifierAttribute)
             {
-                for extended_attribute in &$($mutability)* stringifier_attribute.extended_attributes {
+                for extended_attribute in &$($mutability)* attribute.extended_attributes {
                     self.visit_extended_attribute(extended_attribute);
                 }
 
-                self.visit_type(&$($mutability)* stringifier_attribute.type_);
-                self.visit_identifier(&$($mutability)* stringifier_attribute.name);
+                self.visit_type(&$($mutability)* attribute.type_);
+                self.visit_identifier(&$($mutability)* attribute.name);
             }
 
-            fn walk_stringifier_operation(&mut self,
-                                          stringifier_operation: &'ast $($mutability)* StringifierOperation)
+            fn walk_stringifier_operation(
+                &mut self,
+                stringifier_operation: &'ast $($mutability)* StringifierOperation)
             {
                 match *stringifier_operation {
                     StringifierOperation::Explicit(ref $($mutability)* operation) => {

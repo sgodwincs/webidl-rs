@@ -386,8 +386,10 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
         self.output.push_str("\n};\n\n");
     }
 
-    fn visit_explicit_stringifier_operation(&mut self,
-                                            operation: &'ast ExplicitStringifierOperation) {
+    fn visit_explicit_stringifier_operation(
+        &mut self,
+        operation: &'ast ExplicitStringifierOperation,
+    ) {
         if !operation.extended_attributes.is_empty() {
             self.output.push_str("    ");
             self.stringify_extended_attributes(&operation.extended_attributes);
@@ -476,15 +478,19 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
         self.output.push_str(identifier);
     }
 
-    fn visit_identifier_extended_attribute(&mut self,
-                                           extended_attribute: &'ast IdentifierExtendedAttribute) {
+    fn visit_identifier_extended_attribute(
+        &mut self,
+        extended_attribute: &'ast IdentifierExtendedAttribute,
+    ) {
         self.visit_identifier(&extended_attribute.lhs);
         self.output.push('=');
         self.visit_other(&extended_attribute.rhs);
     }
 
-    fn visit_identifier_list_extended_attribute(&mut self,
-                                                ex: &'ast IdentifierListExtendedAttribute) {
+    fn visit_identifier_list_extended_attribute(
+        &mut self,
+        ex: &'ast IdentifierListExtendedAttribute,
+    ) {
         self.visit_identifier(&ex.lhs);
         self.output.push_str("=(");
 
@@ -511,8 +517,10 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
         self.output.push_str(";\n");
     }
 
-    fn visit_implicit_stringifier_operation(&mut self,
-                                            operation: &'ast ImplicitStringifierOperation) {
+    fn visit_implicit_stringifier_operation(
+        &mut self,
+        operation: &'ast ImplicitStringifierOperation,
+    ) {
         if !operation.extended_attributes.is_empty() {
             self.output.push_str("    ");
             self.stringify_extended_attributes(&operation.extended_attributes);
@@ -560,16 +568,17 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
         self.output.push_str(">;\n");
     }
 
-    fn visit_named_argument_list_extended_attribute(&mut self,
-                                                    ex: &'ast NamedArgumentListExtendedAttribute) {
+    fn visit_named_argument_list_extended_attribute(
+        &mut self,
+        ex: &'ast NamedArgumentListExtendedAttribute,
+    ) {
         self.visit_identifier(&ex.lhs_name);
         self.output.push('=');
         self.visit_identifier(&ex.rhs_name);
         self.stringify_arguments(&ex.rhs_arguments);
     }
 
-    fn visit_non_partial_dictionary(&mut self,
-                                    non_partial_dictionary: &'ast NonPartialDictionary) {
+    fn visit_non_partial_dictionary(&mut self, non_partial_dictionary: &'ast NonPartialDictionary) {
         if !non_partial_dictionary.extended_attributes.is_empty() {
             self.stringify_extended_attributes(&non_partial_dictionary.extended_attributes);
             self.output.push('\n');
@@ -710,8 +719,7 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
         }
     }
 
-    fn visit_other_extended_attribute(&mut self,
-                                      extended_attribute: &'ast OtherExtendedAttribute) {
+    fn visit_other_extended_attribute(&mut self, extended_attribute: &'ast OtherExtendedAttribute) {
         match *extended_attribute {
             OtherExtendedAttribute::Nested {
                 ref group_type,
