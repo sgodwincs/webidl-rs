@@ -1,3 +1,5 @@
+use std::fmt;
+
 /// An enum of all possible tokens allowed by the
 /// [WebIDL grammar](https://heycam.github.io/webidl/#idl-grammar) A token in this case is a
 /// terminal, either a static string or regular expression based token. Note that not all possible
@@ -93,4 +95,10 @@ pub enum Token {
     RightBracket,
     RightParenthesis,
     Semicolon,
+}
+
+impl fmt::Display for Token {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
 }

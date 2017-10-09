@@ -3,9 +3,6 @@
 /// Converts AST to a pretty printed source string.
 pub mod pretty_print;
 
-/// Traverses the AST and validates it against the invariants defined by the specification.
-pub mod validator;
-
 use super::ast::*;
 
 pub use self::pretty_print::PrettyPrintVisitor;
