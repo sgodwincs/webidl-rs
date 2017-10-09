@@ -13,9 +13,7 @@ version = "0.3.2"
 lalrpop = "0.13.1"
 
 [dependencies]
-error-chain = "0.10.0"
 lalrpop-util = "0.13.1"
-petgraph = "0.4.5"
 
 [dependencies.clippy]
 optional = true
