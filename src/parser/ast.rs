@@ -10,7 +10,7 @@ pub type Identifier = String;
 
 /// Do not use - for grammar use only.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub(super) enum BufferRelatedType {
+pub enum BufferRelatedType {
     ArrayBuffer,
     DataView,
     Float32Array,
