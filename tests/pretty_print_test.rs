@@ -110,3 +110,38 @@ fn pretty_print_servo_webidls() {
         assert_eq!(pretty_print_ast, original_ast);
     }
 }
+
+// A test case using the "includes" definition does not appear in the Mozilla WebIDLs, so it needs
+// to be tested separately.
+#[test]
+fn pretty_print_includes() {
+    let parser = Parser::new();
+    let original_ast = parser.parse_string("[test] A includes B;").unwrap();
+
+    let mut visitor = PrettyPrintVisitor::new();
+    visitor.visit(&original_ast);
+
+    let pretty_print_ast = parser.parse_string(&*visitor.get_output()).unwrap();
+    assert_eq!(pretty_print_ast, original_ast);
+}
+
+// A test case using the "mixin" definition does not appear in the Mozilla WebIDLs, so it needs to
+// be tested separately.
+#[test]
+fn pretty_print_mixin() {
+    let parser = Parser::new();
+    let original_ast = parser
+        .parse_string(
+            "[test]
+            partial interface mixin Name {
+                readonly attribute unsigned short entry;
+            };",
+        )
+        .unwrap();
+
+    let mut visitor = PrettyPrintVisitor::new();
+    visitor.visit(&original_ast);
+
+    let pretty_print_ast = parser.parse_string(&*visitor.get_output()).unwrap();
+    assert_eq!(pretty_print_ast, original_ast);
+}

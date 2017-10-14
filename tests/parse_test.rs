@@ -60,8 +60,8 @@ fn parse_includes() {
     );
 }
 
-// A test case using the "mixin" definition does not appear in the Mozilla WebIDLs, so it needs
-// to be tested separately.
+// A test case using the "mixin" definition does not appear in the Mozilla WebIDLs, so it needs to
+// be tested separately.
 #[test]
 fn parse_mixin() {
     use ast::*;
