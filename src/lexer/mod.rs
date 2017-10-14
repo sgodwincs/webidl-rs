@@ -580,12 +580,13 @@ impl<'input> Lexer<'input> {
             "false" => Token::False,
             "float" => Token::Float,
             "getter" => Token::Getter,
-            "implements" => Token::Implements,
+            "includes" => Token::Includes,
             "inherit" => Token::Inherit,
             "interface" => Token::Interface,
             "iterable" => Token::Iterable,
             "long" => Token::Long,
             "maplike" => Token::Maplike,
+            "mixin" => Token::Mixin,
             "namespace" => Token::Namespace,
             "null" => Token::Null,
             "object" => Token::Object,
@@ -1124,12 +1125,13 @@ mod test {
         assert_lex("false", vec![Ok((0, Token::False, 5))]);
         assert_lex("float", vec![Ok((0, Token::Float, 5))]);
         assert_lex("getter", vec![Ok((0, Token::Getter, 6))]);
-        assert_lex("implements", vec![Ok((0, Token::Implements, 10))]);
+        assert_lex("includes", vec![Ok((0, Token::Includes, 8))]);
         assert_lex("inherit", vec![Ok((0, Token::Inherit, 7))]);
         assert_lex("interface", vec![Ok((0, Token::Interface, 9))]);
         assert_lex("iterable", vec![Ok((0, Token::Iterable, 8))]);
         assert_lex("long", vec![Ok((0, Token::Long, 4))]);
         assert_lex("maplike", vec![Ok((0, Token::Maplike, 7))]);
+        assert_lex("mixin", vec![Ok((0, Token::Mixin, 5))]);
         assert_lex("namespace", vec![Ok((0, Token::Namespace, 9))]);
         assert_lex("null", vec![Ok((0, Token::Null, 4))]);
         assert_lex("object", vec![Ok((0, Token::Object, 6))]);

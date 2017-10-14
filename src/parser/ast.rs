@@ -32,6 +32,12 @@ pub enum PrimitiveType {
     UnsignedInteger(UnsignedIntegerType),
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub enum Stringifier {
+    Attribute(Attribute),
+    Operation(Operation),
+}
+
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum UnrestrictedFloatType {
     RestrictedDouble,
@@ -139,8 +145,9 @@ pub enum Definition {
     Callback(Callback),
     Dictionary(Dictionary),
     Enum(Enum),
-    Implements(Implements),
+    Includes(Includes),
     Interface(Interface),
+    Mixin(Mixin),
     Namespace(Namespace),
     Typedef(Typedef),
 }
@@ -198,15 +205,15 @@ pub struct IdentifierListExtendedAttribute {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct Implements {
+pub struct ImplicitStringifierOperation {
     pub extended_attributes: Vec<Box<ExtendedAttribute>>,
-    pub implementor: Identifier,
-    pub implementee: Identifier,
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct ImplicitStringifierOperation {
+pub struct Includes {
     pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub includee: Identifier,
+    pub includer: Identifier,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -242,6 +249,19 @@ pub struct Maplike {
 }
 
 #[derive(Clone, Debug, PartialEq)]
+pub enum Mixin {
+    NonPartial(NonPartialMixin),
+    Partial(PartialMixin),
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum MixinMember {
+    Attribute(Attribute),
+    Const(Const),
+    Operation(Operation),
+}
+
+#[derive(Clone, Debug, PartialEq)]
 pub struct NamedArgumentListExtendedAttribute {
     pub lhs_name: Identifier,
     pub rhs_arguments: Vec<Argument>,
@@ -273,6 +293,13 @@ pub struct NonPartialInterface {
     pub extended_attributes: Vec<Box<ExtendedAttribute>>,
     pub inherits: Option<Identifier>,
     pub members: Vec<InterfaceMember>,
+    pub name: Identifier,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct NonPartialMixin {
+    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub members: Vec<MixinMember>,
     pub name: Identifier,
 }
 
@@ -313,7 +340,7 @@ pub enum Other {
     Float64Array,
     FrozenArray,
     Getter,
-    Implements,
+    Includes,
     Inherit,
     Int16Array,
     Int32Array,
@@ -398,6 +425,13 @@ pub struct PartialDictionary {
 pub struct PartialInterface {
     pub extended_attributes: Vec<Box<ExtendedAttribute>>,
     pub members: Vec<InterfaceMember>,
+    pub name: Identifier,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct PartialMixin {
+    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub members: Vec<MixinMember>,
     pub name: Identifier,
 }
 

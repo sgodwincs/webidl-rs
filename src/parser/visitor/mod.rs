@@ -106,15 +106,15 @@ macro_rules! make_visitor {
                 self.walk_identifier_list_extended_attribute(ex);
             }
 
-            fn visit_implements(&mut self, implements: &'ast $($mutability)* Implements) {
-                self.walk_implements(implements);
-            }
-
             fn visit_implicit_stringifier_operation(
                 &mut self,
                 op: &'ast $($mutability)* ImplicitStringifierOperation)
             {
                 self.walk_implicit_stringifier_operation(op);
+            }
+
+            fn visit_includes(&mut self, includes: &'ast $($mutability)* Includes) {
+                self.walk_includes(includes);
             }
 
             fn visit_interface(&mut self, interface: &'ast $($mutability)* Interface) {
@@ -132,6 +132,14 @@ macro_rules! make_visitor {
 
             fn visit_maplike(&mut self, maplike: &'ast $($mutability)* Maplike) {
                 self.walk_maplike(maplike);
+            }
+
+            fn visit_mixin(&mut self, mixin: &'ast $($mutability)* Mixin) {
+                self.walk_mixin(mixin);
+            }
+
+            fn visit_mixin_member(&mut self, mixin_member: &'ast $($mutability)* MixinMember) {
+                self.walk_mixin_member(mixin_member);
             }
 
             fn visit_named_argument_list_extended_attribute(
@@ -162,6 +170,11 @@ macro_rules! make_visitor {
                 self.walk_non_partial_interface(interface);
             }
 
+            fn visit_non_partial_mixin(&mut self,
+                                       mixin: &'ast $($mutability)* NonPartialMixin) {
+                self.walk_non_partial_mixin(mixin);
+            }
+
             fn visit_non_partial_namespace(&mut self,
                                            namespace: &'ast $($mutability)* NonPartialNamespace) {
                 self.walk_non_partial_namespace(namespace);
@@ -188,6 +201,11 @@ macro_rules! make_visitor {
             fn visit_partial_interface(&mut self,
                                        interface: &'ast $($mutability)* PartialInterface) {
                 self.walk_partial_interface(interface);
+            }
+
+            fn visit_partial_mixin(&mut self,
+                                   mixin: &'ast $($mutability)* PartialMixin) {
+                self.walk_partial_mixin(mixin);
             }
 
             fn visit_partial_namespace(&mut self,
@@ -358,11 +376,14 @@ macro_rules! make_visitor {
                     Definition::Enum(ref $($mutability)* enum_) => {
                         self.visit_enum(enum_);
                     }
-                    Definition::Implements(ref $($mutability)* implements) => {
-                        self.visit_implements(implements);
+                    Definition::Includes(ref $($mutability)* includes) => {
+                        self.visit_includes(includes);
                     }
                     Definition::Interface(ref $($mutability)* interface) => {
                         self.visit_interface(interface);
+                    }
+                    Definition::Mixin(ref $($mutability)* mixin) => {
+                        self.visit_mixin(mixin);
                     }
                     Definition::Namespace(ref $($mutability)* namespace) => {
                         self.visit_namespace(namespace);
@@ -469,15 +490,6 @@ macro_rules! make_visitor {
                 }
             }
 
-            fn walk_implements(&mut self, implements: &'ast $($mutability)* Implements) {
-                for extended_attribute in &$($mutability)* implements.extended_attributes {
-                    self.visit_extended_attribute(extended_attribute);
-                }
-
-                self.visit_identifier(&$($mutability)* implements.implementor);
-                self.visit_identifier(&$($mutability)* implements.implementee);
-            }
-
             fn walk_implicit_stringifier_operation(
                 &mut self,
                 op: &'ast $($mutability)* ImplicitStringifierOperation)
@@ -485,6 +497,15 @@ macro_rules! make_visitor {
                 for extended_attribute in &$($mutability)* op.extended_attributes {
                     self.visit_extended_attribute(extended_attribute);
                 }
+            }
+
+            fn walk_includes(&mut self, includes: &'ast $($mutability)* Includes) {
+                for extended_attribute in &$($mutability)* includes.extended_attributes {
+                    self.visit_extended_attribute(extended_attribute);
+                }
+
+                self.visit_identifier(&$($mutability)* includes.includer);
+                self.visit_identifier(&$($mutability)* includes.includee);
             }
 
             fn walk_interface(&mut self, interface: &'ast $($mutability)* Interface) {
@@ -544,6 +565,31 @@ macro_rules! make_visitor {
 
                 self.visit_type(&$($mutability)* maplike.key_type);
                 self.visit_type(&$($mutability)* maplike.value_type);
+            }
+
+            fn walk_mixin(&mut self, mixin: &'ast $($mutability)* Mixin) {
+                match *mixin {
+                    Mixin::NonPartial(ref $($mutability)* mixin) => {
+                        self.visit_non_partial_mixin(mixin);
+                    }
+                    Mixin::Partial(ref $($mutability)* mixin) => {
+                        self.visit_partial_mixin(mixin);
+                    }
+                }
+            }
+
+            fn walk_mixin_member(&mut self, mixin_member: &'ast $($mutability)* MixinMember) {
+                match *mixin_member {
+                    MixinMember::Attribute(ref $($mutability)* member) => {
+                        self.visit_attribute(member);
+                    }
+                    MixinMember::Const(ref $($mutability)* member) => {
+                        self.visit_const(member);
+                    }
+                    MixinMember::Operation(ref $($mutability)* member) => {
+                        self.visit_operation(member);
+                    }
+                }
             }
 
             fn walk_named_argument_list_extended_attribute(
@@ -616,6 +662,19 @@ macro_rules! make_visitor {
 
                 for member in &$($mutability)* interface.members {
                     self.visit_interface_member(member);
+                }
+            }
+
+            fn walk_non_partial_mixin( &mut self, mixin: &'ast $($mutability)* NonPartialMixin)
+            {
+                for extended_attribute in &$($mutability)* mixin.extended_attributes {
+                    self.visit_extended_attribute(extended_attribute);
+                }
+
+                self.visit_identifier(&$($mutability)* mixin.name);
+
+                for member in &$($mutability)* mixin.members {
+                    self.visit_mixin_member(member);
                 }
             }
 
@@ -715,6 +774,19 @@ macro_rules! make_visitor {
 
                 for member in &$($mutability)* partial_interface.members {
                     self.visit_interface_member(member);
+                }
+            }
+
+            fn walk_partial_mixin(&mut self, partial_mixin: &'ast $($mutability)* PartialMixin)
+            {
+                for extended_attribute in &$($mutability)* partial_mixin.extended_attributes {
+                    self.visit_extended_attribute(extended_attribute);
+                }
+
+                self.visit_identifier(&$($mutability)* partial_mixin.name);
+
+                for member in &$($mutability)* partial_mixin.members {
+                    self.visit_mixin_member(member);
                 }
             }
 

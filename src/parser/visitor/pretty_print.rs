@@ -157,6 +157,31 @@ impl PrettyPrintVisitor {
             }
         }
     }
+
+    fn stringify_mixin_members(&mut self, mixin_members: &[MixinMember]) {
+        let mut iterator = mixin_members.iter().peekable();
+
+        while let Some(member) = iterator.next() {
+            self.visit_mixin_member(member);
+
+            if let Some(next_member) = iterator.peek() {
+                match *member {
+                    MixinMember::Attribute(_) => match **next_member {
+                        MixinMember::Attribute(_) => (),
+                        _ => self.output.push('\n'),
+                    },
+                    MixinMember::Const(_) => match **next_member {
+                        MixinMember::Const(_) => (),
+                        _ => self.output.push('\n'),
+                    },
+                    MixinMember::Operation(_) => match **next_member {
+                        MixinMember::Operation(_) => (),
+                        _ => self.output.push('\n'),
+                    },
+                }
+            }
+        }
+    }
 }
 
 impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
@@ -172,8 +197,8 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
                         Definition::Callback(_) => (),
                         _ => self.output.push('\n'),
                     },
-                    Definition::Implements(_) => match **next_definition {
-                        Definition::Implements(_) => (),
+                    Definition::Includes(_) => match **next_definition {
+                        Definition::Includes(_) => (),
                         _ => self.output.push('\n'),
                     },
                     Definition::Typedef(_) => match **next_definition {
@@ -413,7 +438,7 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
             "Float64Array" => "_Float64Array",
             "FrozenArray" => "_FrozenArray",
             "getter" => "_getter",
-            "implements" => "_implements",
+            "includes" => "_includes",
             "inherit" => "_inherit",
             "Int16Array" => "_Int16Array",
             "Int32Array" => "_Int32Array",
@@ -485,18 +510,6 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
         self.output.push(')');
     }
 
-    fn visit_implements(&mut self, implements: &'ast Implements) {
-        if !implements.extended_attributes.is_empty() {
-            self.stringify_extended_attributes(&implements.extended_attributes);
-            self.output.push('\n');
-        }
-
-        self.visit_identifier(&implements.implementor);
-        self.output.push_str(" implements ");
-        self.visit_identifier(&implements.implementee);
-        self.output.push_str(";\n");
-    }
-
     fn visit_implicit_stringifier_operation(
         &mut self,
         operation: &'ast ImplicitStringifierOperation,
@@ -508,6 +521,18 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
         }
 
         self.output.push_str("    stringifier;\n");
+    }
+
+    fn visit_includes(&mut self, includes: &'ast Includes) {
+        if !includes.extended_attributes.is_empty() {
+            self.stringify_extended_attributes(&includes.extended_attributes);
+            self.output.push('\n');
+        }
+
+        self.visit_identifier(&includes.includer);
+        self.output.push_str(" includes ");
+        self.visit_identifier(&includes.includee);
+        self.output.push_str(";\n");
     }
 
     fn visit_iterable(&mut self, iterable: &'ast Iterable) {
@@ -600,6 +625,20 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
         self.output.push_str("};\n\n");
     }
 
+    fn visit_non_partial_mixin(&mut self, non_partial_mixin: &'ast NonPartialMixin) {
+        if !non_partial_mixin.extended_attributes.is_empty() {
+            self.stringify_extended_attributes(&non_partial_mixin.extended_attributes);
+            self.output.push('\n');
+        }
+
+        self.output.push_str("interface mixin ");
+        self.visit_identifier(&non_partial_mixin.name);
+
+        self.output.push_str(" {\n");
+        self.stringify_mixin_members(&non_partial_mixin.members);
+        self.output.push_str("};\n\n");
+    }
+
     fn visit_non_partial_namespace(&mut self, non_partial_namespace: &'ast NonPartialNamespace) {
         if !non_partial_namespace.extended_attributes.is_empty() {
             self.stringify_extended_attributes(&non_partial_namespace.extended_attributes);
@@ -635,7 +674,7 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
             Other::Float64Array => self.output.push_str("Float64Array"),
             Other::FrozenArray => self.output.push_str("FrozenArray"),
             Other::Getter => self.output.push_str("getter"),
-            Other::Implements => self.output.push_str("implements"),
+            Other::Includes => self.output.push_str("includes"),
             Other::Inherit => self.output.push_str("inherit"),
             Other::Int16Array => self.output.push_str("Int16Array"),
             Other::Int32Array => self.output.push_str("Int32Array"),
@@ -772,6 +811,19 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
         self.visit_identifier(&partial_interface.name);
         self.output.push_str(" {\n");
         self.stringify_interface_members(&partial_interface.members);
+        self.output.push_str("};\n\n");
+    }
+
+    fn visit_partial_mixin(&mut self, partial_mixin: &'ast PartialMixin) {
+        if !partial_mixin.extended_attributes.is_empty() {
+            self.stringify_extended_attributes(&partial_mixin.extended_attributes);
+            self.output.push('\n');
+        }
+
+        self.output.push_str("partial interface mixin ");
+        self.visit_identifier(&partial_mixin.name);
+        self.output.push_str(" {\n");
+        self.stringify_mixin_members(&partial_mixin.members);
         self.output.push_str("};\n\n");
     }
 
