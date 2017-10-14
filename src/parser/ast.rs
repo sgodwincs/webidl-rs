@@ -8,8 +8,9 @@ pub type Identifier = String;
 // as private types when `pub(super)` is used. This is not the case since all of their variants are
 // matched into other structures, but I suppose it is not a big deal.
 
+/// Do not use - for grammar use only.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
-pub enum BufferRelatedType {
+pub(super) enum BufferRelatedType {
     ArrayBuffer,
     DataView,
     Float32Array,
@@ -23,6 +24,7 @@ pub enum BufferRelatedType {
     Uint8ClampedArray,
 }
 
+/// Do not use - for grammar use only.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum PrimitiveType {
     Boolean,
@@ -32,12 +34,14 @@ pub enum PrimitiveType {
     UnsignedInteger(UnsignedIntegerType),
 }
 
+/// Do not use - for grammar use only.
 #[derive(Clone, Debug, PartialEq)]
 pub enum Stringifier {
     Attribute(Attribute),
     Operation(Operation),
 }
 
+/// Do not use - for grammar use only.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum UnrestrictedFloatType {
     RestrictedDouble,
@@ -46,6 +50,7 @@ pub enum UnrestrictedFloatType {
     UnrestrictedFloat,
 }
 
+/// Do not use - for grammar use only.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum UnsignedIntegerType {
     SignedLong,
