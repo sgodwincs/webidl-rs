@@ -1,6 +1,6 @@
 #![cfg_attr(feature = "clippy", feature(plugin))]
 #![cfg_attr(feature = "clippy", plugin(clippy))]
-#![deny(fat_ptr_transmutes, missing_copy_implementations, missing_debug_implementations,
+#![deny(missing_copy_implementations, missing_debug_implementations,
        missing_docs, trivial_casts, trivial_numeric_casts, unsafe_code, unused_import_braces,
        unused_qualifications, variant_size_differences)]
 
