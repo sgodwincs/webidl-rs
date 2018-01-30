@@ -49,9 +49,9 @@ fn parse_includes() {
         vec![
             Definition::Includes(Includes {
                 extended_attributes: vec![
-                    Box::new(ExtendedAttribute::NoArguments(
-                        Other::Identifier("test".to_string()),
-                    )),
+                    Box::new(ExtendedAttribute::NoArguments(Other::Identifier(
+                        "test".to_string(),
+                    ))),
                 ],
                 includee: "B".to_string(),
                 includer: "A".to_string(),
@@ -81,9 +81,9 @@ fn parse_mixin() {
         vec![
             Definition::Mixin(Mixin::Partial(PartialMixin {
                 extended_attributes: vec![
-                    Box::new(ExtendedAttribute::NoArguments(
-                        Other::Identifier("test".to_string()),
-                    )),
+                    Box::new(ExtendedAttribute::NoArguments(Other::Identifier(
+                        "test".to_string(),
+                    ))),
                 ],
                 members: vec![
                     MixinMember::Attribute(Attribute::Regular(RegularAttribute {

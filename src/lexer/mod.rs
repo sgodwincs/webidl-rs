@@ -364,9 +364,10 @@ impl<'input> Lexer<'input> {
                 self.chars.next();
                 Some(Ok((start, Token::Ellipsis, start + 3)))
             }
-            _ => Some(Err(
-                create_error(LexicalErrorCode::ExpectedEllipsis, start + 2),
-            )),
+            _ => Some(Err(create_error(
+                LexicalErrorCode::ExpectedEllipsis,
+                start + 2,
+            ))),
         }
     }
 
@@ -415,9 +416,10 @@ impl<'input> Lexer<'input> {
                         float_lex_state = FloatLexState::ImmediatelyAfterExponentBase;
                     }
                     _ if float_literal.starts_with("-.") => {
-                        return Some(Err(
-                            create_error(LexicalErrorCode::ExpectedDecimalDigit, offset),
-                        ))
+                        return Some(Err(create_error(
+                            LexicalErrorCode::ExpectedDecimalDigit,
+                            offset,
+                        )))
                     }
                     _ => {
                         return Some(Ok((
@@ -507,9 +509,11 @@ impl<'input> Lexer<'input> {
                     _ => {
                         let hexadecimal_literal =
                             i64::from_str_radix(&*hexadecimal_literal, 16).unwrap();
-                        return Some(Ok(
-                            (start, Token::IntegerLiteral(hexadecimal_literal), offset),
-                        ));
+                        return Some(Ok((
+                            start,
+                            Token::IntegerLiteral(hexadecimal_literal),
+                            offset,
+                        )));
                     }
                 }
             },
@@ -525,11 +529,11 @@ impl<'input> Lexer<'input> {
     fn lex_identifier(&mut self, offset: &mut usize, mut identifier: &mut String) {
         loop {
             match self.chars.peek() {
-                Some(&(_, c @ 'A'...'Z')) |
-                Some(&(_, c @ 'a'...'z')) |
-                Some(&(_, c @ '0'...'9')) |
-                Some(&(_, c @ '_')) |
-                Some(&(_, c @ '-')) => {
+                Some(&(_, c @ 'A'...'Z'))
+                | Some(&(_, c @ 'a'...'z'))
+                | Some(&(_, c @ '0'...'9'))
+                | Some(&(_, c @ '_'))
+                | Some(&(_, c @ '-')) => {
                     self.push_next_char(&mut identifier, c, offset);
                 }
                 _ => break,
@@ -659,9 +663,11 @@ impl<'input> Lexer<'input> {
                                 if c > '7' {
                                     if !self.lookahead_for_decimal_point() {
                                         let literal = i64::from_str_radix(&*literal, 8).unwrap();
-                                        return Some(
-                                            Ok((start, Token::IntegerLiteral(literal), offset)),
-                                        );
+                                        return Some(Ok((
+                                            start,
+                                            Token::IntegerLiteral(literal),
+                                            offset,
+                                        )));
                                     }
 
                                     self.push_next_char(&mut literal, c, &mut offset);
@@ -1231,11 +1237,7 @@ mod test {
         assert_lex(
             r#""this is a string""#,
             vec![
-                Ok((
-                    0,
-                    Token::StringLiteral("this is a string".to_string()),
-                    18,
-                )),
+                Ok((0, Token::StringLiteral("this is a string".to_string()), 18)),
             ],
         );
         assert_lex(
