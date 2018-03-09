@@ -10,12 +10,13 @@ name = "webidl"
 readme = "README.md"
 repository = "https://github.com/sgodwincs/webidl-rs"
 version = "0.4.1"
+exclude = ["tests/*.zip", "src/parser/grammar.rs"]
 
 [build-dependencies]
-lalrpop = "0.13.1"
+lalrpop = "^0.14"
 
 [dependencies]
-lalrpop-util = "0.13.1"
+lalrpop-util = "^0.14"
 
 [dependencies.clippy]
 optional = true
