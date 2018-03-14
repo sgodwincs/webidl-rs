@@ -2,6 +2,15 @@
 #[allow(unknown_lints)]
 #[allow(clippy)]
 mod grammar {
+    // During the build step, `build.rs` will output the generated parser to `OUT_DIR` to avoid
+    // adding it to the source directory, so we just directly include the generated parser here.
+    //
+    // Even with `.gitignore` and the `exclude` in the `Cargo.toml`, the generated parser can still
+    // end up in the source directory. This could happen when `cargo build` builds the file out of
+    // the Cargo cache (`$HOME/.cargo/registrysrc`), and the build script would then put its output
+    // in that cached source directory because of https://github.com/lalrpop/lalrpop/issues/280.
+    // Later runs of `cargo vendor` then copy the source from that directory, including the 
+    // generated file.
     include!(concat!(env!("OUT_DIR"), "/parser/grammar.rs"));
 }
 
