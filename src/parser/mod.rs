@@ -1,7 +1,9 @@
 #[cfg_attr(rustfmt, rustfmt_skip)]
 #[allow(unknown_lints)]
 #[allow(clippy)]
-mod grammar;
+mod grammar {
+    include!(concat!(env!("OUT_DIR"), "/parser/grammar.rs"));
+}
 
 /// Contains all structures related to the AST for the WebIDL grammar.
 pub mod ast;
