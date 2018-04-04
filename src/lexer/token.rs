@@ -30,6 +30,7 @@ pub enum Token {
     Float64Array,
     FrozenArray,
     Getter,
+    Implements,
     Includes,
     Inherit,
     Int16Array,

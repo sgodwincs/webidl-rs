@@ -16,22 +16,7 @@ fn parse_servo_webidls() {
         let mut file = archive.by_index(i).unwrap();
         let mut webidl = String::new();
         file.read_to_string(&mut webidl).unwrap();
-
-        // With the new update to the specification, the "implements" definition has been replaced
-        // with "includes", but the Mozilla WebIDLs have not been updated.
-
-        if let Err(err) = parser.parse_string(&*webidl) {
-            match err {
-                ParseError::UnrecognizedToken {
-                    token: Some((_, ref token, _)),
-                    ..
-                } if *token == Token::Identifier("implements".to_string()) =>
-                {
-                    break
-                }
-                _ => panic!("parse error: {:?}", err),
-            }
-        }
+        parser.parse_string(&*webidl).expect("parsing failed");
     }
 }
 

@@ -150,6 +150,7 @@ pub enum Definition {
     Callback(Callback),
     Dictionary(Dictionary),
     Enum(Enum),
+    Implements(Implements),
     Includes(Includes),
     Interface(Interface),
     Mixin(Mixin),
@@ -207,6 +208,15 @@ pub struct IdentifierExtendedAttribute {
 pub struct IdentifierListExtendedAttribute {
     pub lhs: Identifier,
     pub rhs: Vec<Identifier>,
+}
+
+/// Note that this is no longer a part of the WebIDL specification, but exists for backwards
+/// compatibility of older WebIDLs.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Implements {
+    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub implementer: Identifier,
+    pub implementee: Identifier,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -345,6 +355,7 @@ pub enum Other {
     Float64Array,
     FrozenArray,
     Getter,
+    Implements,
     Includes,
     Inherit,
     Int16Array,

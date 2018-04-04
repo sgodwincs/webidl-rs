@@ -197,6 +197,10 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
                         Definition::Callback(_) => (),
                         _ => self.output.push('\n'),
                     },
+                    Definition::Implements(_) => match **next_definition {
+                        Definition::Implements(_) => (),
+                        _ => self.output.push('\n'),
+                    },
                     Definition::Includes(_) => match **next_definition {
                         Definition::Includes(_) => (),
                         _ => self.output.push('\n'),
@@ -438,6 +442,7 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
             "Float64Array" => "_Float64Array",
             "FrozenArray" => "_FrozenArray",
             "getter" => "_getter",
+            "implements" => "_implements",
             "includes" => "_includes",
             "inherit" => "_inherit",
             "Int16Array" => "_Int16Array",
@@ -521,6 +526,18 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
         }
 
         self.output.push_str("    stringifier;\n");
+    }
+
+    fn visit_implements(&mut self, implements: &'ast Implements) {
+        if !implements.extended_attributes.is_empty() {
+            self.stringify_extended_attributes(&implements.extended_attributes);
+            self.output.push('\n');
+        }
+
+        self.visit_identifier(&implements.implementer);
+        self.output.push_str(" implements ");
+        self.visit_identifier(&implements.implementee);
+        self.output.push_str(";\n");
     }
 
     fn visit_includes(&mut self, includes: &'ast Includes) {
@@ -674,6 +691,7 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
             Other::Float64Array => self.output.push_str("Float64Array"),
             Other::FrozenArray => self.output.push_str("FrozenArray"),
             Other::Getter => self.output.push_str("getter"),
+            Other::Implements => self.output.push_str("implements"),
             Other::Includes => self.output.push_str("includes"),
             Other::Inherit => self.output.push_str("inherit"),
             Other::Int16Array => self.output.push_str("Int16Array"),

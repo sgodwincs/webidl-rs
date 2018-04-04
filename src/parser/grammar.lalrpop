@@ -75,6 +75,7 @@ ArgumentNameKeyword: ast::Identifier = {
     "dictionary" => "dictionary".to_string(),
     "enum" => "enum".to_string(),
     "getter" => "getter".to_string(),
+    "implements" => "implements".to_string(),
     "includes" => "includes".to_string(),
     "inherit" => "inherit".to_string(),
     "interface" => "interface".to_string(),
@@ -233,6 +234,7 @@ Definition: ast::Definition = {
     Enum => ast::Definition::Enum(<>),
     Typedef => ast::Definition::Typedef(<>),
     IncludesStatement => ast::Definition::Includes(<>),
+    ImplementsStatement => ast::Definition::Implements(<>)
 };
 
 pub Definitions: Vec<ast::Definition> = {
@@ -257,6 +259,9 @@ pub Definitions: Vec<ast::Definition> = {
                     }
                     ast::Definition::Enum(ref mut enum_definition) => {
                         enum_definition.extended_attributes = extended_attributes;
+                    }
+                    ast::Definition::Implements(ref mut implements) => {
+                        implements.extended_attributes = extended_attributes;
                     }
                     ast::Definition::Includes(ref mut includes) => {
                         includes.extended_attributes = extended_attributes;
@@ -576,6 +581,16 @@ Identifiers: Vec<ast::Identifier> = {
                 identifiers
             }
             None => vec![]
+        }
+    }
+};
+
+ImplementsStatement: ast::Implements = {
+    <implementer: "Identifier"> "implements" <implementee: "Identifier"> ";" => {
+        ast::Implements {
+            extended_attributes: vec![],
+            implementee,
+            implementer
         }
     }
 };
@@ -1077,6 +1092,7 @@ Other: ast::Other = {
     "Float64Array" => ast::Other::Float64Array,
     "FrozenArray" => ast::Other::FrozenArray,
     "getter" => ast::Other::Getter,
+    "implements" => ast::Other::Implements,
     "includes" => ast::Other::Includes,
     "inherit" => ast::Other::Inherit,
     "Int16Array" => ast::Other::Int16Array,
@@ -1492,6 +1508,7 @@ extern {
         "Float64Array" => Token::Float64Array,
         "FrozenArray" => Token::FrozenArray,
         "getter" => Token::Getter,
+        "implements" => Token::Implements,
         "includes" => Token::Includes,
         "inherit" => Token::Inherit,
         "Int16Array" => Token::Int16Array,

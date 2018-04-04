@@ -113,6 +113,10 @@ macro_rules! make_visitor {
                 self.walk_implicit_stringifier_operation(op);
             }
 
+            fn visit_implements(&mut self, implements: &'ast $($mutability)* Implements) {
+                self.walk_implements(implements);
+            }
+
             fn visit_includes(&mut self, includes: &'ast $($mutability)* Includes) {
                 self.walk_includes(includes);
             }
@@ -376,6 +380,9 @@ macro_rules! make_visitor {
                     Definition::Enum(ref $($mutability)* enum_) => {
                         self.visit_enum(enum_);
                     }
+                    Definition::Implements(ref $($mutability)* implements) => {
+                        self.visit_implements(implements);
+                    }
                     Definition::Includes(ref $($mutability)* includes) => {
                         self.visit_includes(includes);
                     }
@@ -497,6 +504,15 @@ macro_rules! make_visitor {
                 for extended_attribute in &$($mutability)* op.extended_attributes {
                     self.visit_extended_attribute(extended_attribute);
                 }
+            }
+
+            fn walk_implements(&mut self, implements: &'ast $($mutability)* Implements) {
+                for extended_attribute in &$($mutability)* implements.extended_attributes {
+                    self.visit_extended_attribute(extended_attribute);
+                }
+
+                self.visit_identifier(&$($mutability)* implements.implementer);
+                self.visit_identifier(&$($mutability)* implements.implementee);
             }
 
             fn walk_includes(&mut self, includes: &'ast $($mutability)* Includes) {
