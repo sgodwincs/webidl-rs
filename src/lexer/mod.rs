@@ -4,8 +4,8 @@ mod token;
 
 use std::error::Error;
 use std::fmt;
-use std::iter::Peekable;
 use std::i64;
+use std::iter::Peekable;
 use std::str::CharIndices;
 
 pub use self::token::Token;
@@ -589,6 +589,7 @@ impl<'input> Lexer<'input> {
             "inherit" => Token::Inherit,
             "interface" => Token::Interface,
             "iterable" => Token::Iterable,
+            "legacycaller" => Token::LegacyCaller,
             "long" => Token::Long,
             "maplike" => Token::Maplike,
             "mixin" => Token::Mixin,
@@ -1137,6 +1138,7 @@ mod test {
         assert_lex("inherit", vec![Ok((0, Token::Inherit, 7))]);
         assert_lex("interface", vec![Ok((0, Token::Interface, 9))]);
         assert_lex("iterable", vec![Ok((0, Token::Iterable, 8))]);
+        assert_lex("legacycaller", vec![Ok((0, Token::LegacyCaller, 12))]);
         assert_lex("long", vec![Ok((0, Token::Long, 4))]);
         assert_lex("maplike", vec![Ok((0, Token::Maplike, 7))]);
         assert_lex("mixin", vec![Ok((0, Token::Mixin, 5))]);

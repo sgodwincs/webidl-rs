@@ -1,7 +1,7 @@
 use std::f64;
 
-use parser::ast::*;
 use super::ImmutableVisitor;
+use parser::ast::*;
 
 /// A visitor that can be used to convert an AST back into source code.
 ///
@@ -450,6 +450,7 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
             "Int8Array" => "_Int8Array",
             "interface" => "_interface",
             "iterable" => "_iterable",
+            "legacycaller" => "_legacycaller",
             "long" => "_long",
             "maplike" => "_maplike",
             "namespace" => "_namespace",
@@ -699,6 +700,7 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
             Other::Int8Array => self.output.push_str("Int8Array"),
             Other::Interface => self.output.push_str("interface"),
             Other::Iterable => self.output.push_str("iterable"),
+            Other::LegacyCaller => self.output.push_str("legacycaller"),
             Other::Long => self.output.push_str("long"),
             Other::Maplike => self.output.push_str("maplike"),
             Other::Namespace => self.output.push_str("namespace"),
@@ -930,6 +932,7 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
         match *special {
             Special::Deleter => self.output.push_str("deleter"),
             Special::Getter => self.output.push_str("getter"),
+            Special::LegacyCaller => self.output.push_str("legacycaller"),
             Special::Setter => self.output.push_str("setter"),
         }
     }

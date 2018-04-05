@@ -29,39 +29,26 @@ use lexer::{LexicalError, Token};
 /// be either an error from the lexer or the parser.
 pub type ParseResult = Result<ast::AST, ParseError<usize, Token, LexicalError>>;
 
-/// The parser that is used to parse WebIDL. It really serves as a wrapper around the parse
-/// function exposed by lalrpop.
-#[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq)]
-pub struct Parser;
-
-impl Parser {
-    /// Creates a new parser.
-    pub fn new() -> Self {
-        Parser
-    }
-
-    /// Parses a given input string and returns an AST.
-    ///
-    /// # Example
-    ///
-    /// ```
-    /// use webidl::*;
-    /// use webidl::ast::*;
-    ///
-    /// let parser = Parser::new();
-    /// let result = parser.parse_string("[Attribute] interface Node { };");
-    ///
-    /// assert_eq!(result,
-    ///            Ok(vec![Definition::Interface(Interface::NonPartial(NonPartialInterface {
-    ///                 extended_attributes: vec![
-    ///                     Box::new(ExtendedAttribute::NoArguments(
-    ///                         Other::Identifier("Attribute".to_string())))],
-    ///                 inherits: None,
-    ///                 members: vec![],
-    ///                 name: "Node".to_string()
-    ///            }))]));
-    /// ```
-    pub fn parse_string(&self, input: &str) -> ParseResult {
-        grammar::parse_Definitions(::Lexer::new(input))
-    }
+/// Parses a given input string and returns an AST.
+///
+/// # Example
+///
+/// ```
+/// use webidl::*;
+/// use webidl::ast::*;
+///
+/// let result = parse_string("[Attribute] interface Node { };");
+///
+/// assert_eq!(result,
+///            Ok(vec![Definition::Interface(Interface::NonPartial(NonPartialInterface {
+///                 extended_attributes: vec![
+///                     Box::new(ExtendedAttribute::NoArguments(
+///                         Other::Identifier("Attribute".to_string())))],
+///                 inherits: None,
+///                 members: vec![],
+///                 name: "Node".to_string()
+///            }))]));
+/// ```
+pub fn parse_string(input: &str) -> ParseResult {
+    grammar::parse_Definitions(::Lexer::new(input))
 }

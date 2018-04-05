@@ -8,7 +8,6 @@ use webidl::*;
 
 #[test]
 fn parse_servo_webidls() {
-    let parser = Parser::new();
     let file = fs::File::open("tests/mozilla_webidls.zip").unwrap();
     let mut archive = zip::ZipArchive::new(file).unwrap();
 
@@ -16,7 +15,7 @@ fn parse_servo_webidls() {
         let mut file = archive.by_index(i).unwrap();
         let mut webidl = String::new();
         file.read_to_string(&mut webidl).unwrap();
-        parser.parse_string(&*webidl).expect("parsing failed");
+        parse_string(&*webidl).expect("parsing failed");
     }
 }
 
@@ -26,8 +25,7 @@ fn parse_servo_webidls() {
 fn parse_includes() {
     use ast::*;
 
-    let parser = Parser::new();
-    let ast = parser.parse_string("[test] A includes B;").unwrap();
+    let ast = parse_string("[test] A includes B;").unwrap();
 
     assert_eq!(
         ast,
@@ -51,15 +49,12 @@ fn parse_includes() {
 fn parse_mixin() {
     use ast::*;
 
-    let parser = Parser::new();
-    let ast = parser
-        .parse_string(
-            "[test]
+    let ast = parse_string(
+        "[test]
             partial interface mixin Name {
                 readonly attribute unsigned short entry;
             };",
-        )
-        .unwrap();
+    ).unwrap();
 
     assert_eq!(
         ast,

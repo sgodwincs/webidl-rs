@@ -80,6 +80,7 @@ ArgumentNameKeyword: ast::Identifier = {
     "inherit" => "inherit".to_string(),
     "interface" => "interface".to_string(),
     "iterable" => "iterable".to_string(),
+    "legacycaller" => "legacycaller".to_string(),
     "maplike" => "maplike".to_string(),
     "namespace" => "namespace".to_string(),
     "partial" => "partial".to_string(),
@@ -1100,6 +1101,7 @@ Other: ast::Other = {
     "Int8Array" => ast::Other::Int8Array,
     "interface" => ast::Other::Interface,
     "iterable" => ast::Other::Iterable,
+    "legacycaller" => ast::Other::LegacyCaller,
     "long" => ast::Other::Long,
     "maplike" => ast::Other::Maplike,
     "namespace" => ast::Other::Namespace,
@@ -1323,9 +1325,10 @@ SpecialOperation: ast::Operation = {
 };
 
 Special: ast::Special = {
+    "deleter" => ast::Special::Deleter,
     "getter" => ast::Special::Getter,
-    "setter" => ast::Special::Setter,
-    "deleter" => ast::Special::Deleter
+    "legacycaller" => ast::Special::LegacyCaller,
+    "setter" => ast::Special::Setter
 };
 
 Specials: Vec<ast::Special> = {
@@ -1516,6 +1519,7 @@ extern {
         "Int8Array" => Token::Int8Array,
         "interface" => Token::Interface,
         "iterable" => Token::Iterable,
+        "legacycaller" => Token::LegacyCaller,
         "long" => Token::Long,
         "maplike" => Token::Maplike,
         "mixin" => Token::Mixin,

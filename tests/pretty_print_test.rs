@@ -5,9 +5,9 @@ use std::f64;
 use std::fs;
 use std::io::Read;
 
-use webidl::*;
 use webidl::ast::*;
 use webidl::visitor::*;
+use webidl::*;
 
 // Test to make sure that Infinity/-Infinity/NaN are correctly pretty printed since they do not
 // appear in the Servo WebIDLs.
@@ -57,7 +57,6 @@ fn pretty_print_float_literals() {
 
 #[test]
 fn pretty_print_servo_webidls() {
-    let parser = Parser::new();
     let file = fs::File::open("tests/mozilla_webidls.zip").unwrap();
     let mut archive = zip::ZipArchive::new(file).unwrap();
 
@@ -69,7 +68,7 @@ fn pretty_print_servo_webidls() {
         // With the new update to the specification, the "implements" definition has been replaced
         // with "includes", but the Mozilla WebIDLs have not been updated.
 
-        let original_ast = match parser.parse_string(&*webidl) {
+        let original_ast = match parse_string(&*webidl) {
             Ok(ast) => ast,
             Err(err) => match err {
                 ParseError::UnrecognizedToken {
@@ -86,27 +85,9 @@ fn pretty_print_servo_webidls() {
         let mut visitor = PrettyPrintVisitor::new();
         visitor.visit(&original_ast);
 
-        // With the new update to the specification, the "implements" definition has been replaced
-        // with "includes", but the Mozilla WebIDLs have not been updated. There is some code
-        // duplication, but I do not believe it is a big deal since hopefully this is a temporary
-        // fix.
-
         // Compare original AST with AST obtained from pretty print visitor.
 
-        let pretty_print_ast = match parser.parse_string(&*visitor.get_output()) {
-            Ok(ast) => ast,
-            Err(err) => match err {
-                ParseError::UnrecognizedToken {
-                    token: Some((_, ref token, _)),
-                    ..
-                } if *token == Token::Identifier("implements".to_string()) =>
-                {
-                    continue;
-                }
-                _ => panic!("parse error: {:?}", err),
-            },
-        };
-
+        let pretty_print_ast = parse_string(&*visitor.get_output()).expect("parsing failed");
         assert_eq!(pretty_print_ast, original_ast);
     }
 }
@@ -115,13 +96,12 @@ fn pretty_print_servo_webidls() {
 // to be tested separately.
 #[test]
 fn pretty_print_includes() {
-    let parser = Parser::new();
-    let original_ast = parser.parse_string("[test] A includes B;").unwrap();
+    let original_ast = parse_string("[test] A includes B;").unwrap();
 
     let mut visitor = PrettyPrintVisitor::new();
     visitor.visit(&original_ast);
 
-    let pretty_print_ast = parser.parse_string(&*visitor.get_output()).unwrap();
+    let pretty_print_ast = parse_string(&*visitor.get_output()).unwrap();
     assert_eq!(pretty_print_ast, original_ast);
 }
 
@@ -129,19 +109,16 @@ fn pretty_print_includes() {
 // be tested separately.
 #[test]
 fn pretty_print_mixin() {
-    let parser = Parser::new();
-    let original_ast = parser
-        .parse_string(
-            "[test]
+    let original_ast = parse_string(
+        "[test]
             partial interface mixin Name {
                 readonly attribute unsigned short entry;
             };",
-        )
-        .unwrap();
+    ).unwrap();
 
     let mut visitor = PrettyPrintVisitor::new();
     visitor.visit(&original_ast);
 
-    let pretty_print_ast = parser.parse_string(&*visitor.get_output()).unwrap();
+    let pretty_print_ast = parse_string(&*visitor.get_output()).unwrap();
     assert_eq!(pretty_print_ast, original_ast);
 }

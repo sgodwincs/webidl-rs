@@ -38,6 +38,7 @@ pub enum Token {
     Int8Array,
     Interface,
     Iterable,
+    LegacyCaller,
     Long,
     Maplike,
     Mixin,
