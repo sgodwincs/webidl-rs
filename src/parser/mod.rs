@@ -50,5 +50,5 @@ pub type ParseResult = Result<ast::AST, ParseError<usize, Token, LexicalError>>;
 ///            }))]));
 /// ```
 pub fn parse_string(input: &str) -> ParseResult {
-    grammar::parse_Definitions(::Lexer::new(input))
+    grammar::DefinitionsParser::new().parse(::Lexer::new(input))
 }
