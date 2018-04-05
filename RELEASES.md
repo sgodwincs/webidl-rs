@@ -4,7 +4,18 @@
  - Add back support for parsing `implements` statement for backwards compatibility with older WebIDLs
  - Add back support for parsing `legacycaller` in special operations for backwards compatibility with older WebIDLs
  - Update `lalrpop` to `0.15.1`. Version `0.15.0` cannot be used as it breaks with usage of `include!`
- - Remove unnecessary `Parser` struct, since it does not do anything
+ - Remove unnecessary `Parser` struct, since it does not do anything. Instead of doing
+
+ ```
+ let parser = Parser::new();
+ let result = parser.parse_string(...);
+ ```
+
+ You can now simply do
+
+ ```
+ let result = parse_string(...);
+ ```
 
 # 0.5.0
 
