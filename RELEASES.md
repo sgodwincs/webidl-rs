@@ -1,3 +1,7 @@
+# 0.7.0
+
+ - Fixed bug where integer literals outside the range of `i64` could not be represented ([#15](https://github.com/sgodwincs/webidl-rs/pull/15) 
+
 # 0.6.0
 
  - Fixed bug where the generated parser would still be in the source directory ([#13](https://github.com/sgodwincs/webidl-rs/pull/13))
