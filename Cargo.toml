@@ -9,7 +9,7 @@ license = "MIT"
 name = "webidl"
 readme = "README.md"
 repository = "https://github.com/sgodwincs/webidl-rs"
-version = "0.6.0"
+version = "0.7.0"
 exclude = ["tests/*.zip"]
 
 [build-dependencies]
