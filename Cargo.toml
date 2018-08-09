@@ -13,10 +13,10 @@ version = "0.7.0"
 exclude = ["tests/*.zip"]
 
 [build-dependencies]
-lalrpop = "0.15.1"
+lalrpop = "0.15"
 
 [dependencies]
-lalrpop-util = "0.15.1"
+lalrpop-util = "0.15"
 
 [dependencies.clippy]
 optional = true
