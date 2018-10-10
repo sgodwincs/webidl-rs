@@ -1,3 +1,7 @@
+# 0.8.0
+
+ - Update `lalrpop` to `0.16.0` to reduce package size.
+
 # 0.7.0
 
  - Fixed bug where integer literals outside the range of `i64` could not be represented ([#15](https://github.com/sgodwincs/webidl-rs/pull/15) 
