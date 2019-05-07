@@ -72,7 +72,7 @@ fn pretty_print_servo_webidls() {
             Ok(ast) => ast,
             Err(err) => match err {
                 ParseError::UnrecognizedToken {
-                    token: Some((_, ref token, _)),
+                    token: (_, ref token, _),
                     ..
                 } if *token == Token::Identifier("implements".to_string()) =>
                 {
