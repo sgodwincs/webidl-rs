@@ -221,9 +221,9 @@ impl<'input> Lexer<'input> {
     ///
     /// The return value is an `Option`, with a value of `None` signifying EOF, whereas `Some` is
     /// a value of type `Spanned`.
-    #[cfg_attr(rustfmt, rustfmt_skip)]
+    #[rustfmt::skip]
     #[allow(unknown_lints)]
-    #[allow(cyclomatic_complexity)]
+    #[allow(clippy::cognitive_complexity)]
     fn get_next_token(&mut self) -> Option<<Self as Iterator>::Item> {
         loop {
             return match self.chars.next() {

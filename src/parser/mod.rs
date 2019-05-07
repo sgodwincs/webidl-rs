@@ -1,6 +1,6 @@
 #[cfg_attr(rustfmt, rustfmt_skip)]
 #[allow(unknown_lints)]
-#[allow(clippy)]
+#[allow(clippy::all)]
 mod grammar {
     // During the build step, `build.rs` will output the generated parser to `OUT_DIR` to avoid
     // adding it to the source directory, so we just directly include the generated parser here.
@@ -42,8 +42,8 @@ pub type ParseResult = Result<ast::AST, ParseError<usize, Token, LexicalError>>;
 /// assert_eq!(result,
 ///            Ok(vec![Definition::Interface(Interface::NonPartial(NonPartialInterface {
 ///                 extended_attributes: vec![
-///                     Box::new(ExtendedAttribute::NoArguments(
-///                         Other::Identifier("Attribute".to_string())))],
+///                     ExtendedAttribute::NoArguments(
+///                         Other::Identifier("Attribute".to_string()))],
 ///                 inherits: None,
 ///                 members: vec![],
 ///                 name: "Node".to_string()

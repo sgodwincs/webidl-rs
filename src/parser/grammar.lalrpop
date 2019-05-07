@@ -102,7 +102,7 @@ AttributeNameKeyword: ast::Identifier = {
     "required" => "required".to_string()
 };
 
-AttributeRest: (Box<ast::Type>, ast::Identifier) = {
+AttributeRest: (ast::Type, ast::Identifier) = {
     "attribute" <type_: TypeWithExtendedAttributes> <name: AttributeName> ";" => (type_, name)
 };
 
@@ -413,7 +413,7 @@ EnumValueListString: Vec<String> = {
     }
 };
 
-ExtendedAttribute: Box<ast::ExtendedAttribute> = {
+ExtendedAttribute: ast::ExtendedAttribute = {
     ExtendedAttributeArgList,
     ExtendedAttributeIdent,
     ExtendedAttributeIdentList,
@@ -422,7 +422,7 @@ ExtendedAttribute: Box<ast::ExtendedAttribute> = {
     // ExtendedAttributeOther
 };
 
-ExtendedAttributeInner: Box<ast::ExtendedAttribute> = {
+ExtendedAttributeInner: ast::ExtendedAttribute = {
     ExtendedAttributeArgList,
     ExtendedAttributeIdent,
     ExtendedAttributeIdentList,
@@ -431,34 +431,34 @@ ExtendedAttributeInner: Box<ast::ExtendedAttribute> = {
     // ExtendedAttributeOtherInner
 };
 
-ExtendedAttributeArgList: Box<ast::ExtendedAttribute> = {
+ExtendedAttributeArgList: ast::ExtendedAttribute = {
     <name: "Identifier"> "(" <arguments: ArgumentList> ")" => {
-        Box::new(ast::ExtendedAttribute::ArgumentList(ast::ArgumentListExtendedAttribute {
+        ast::ExtendedAttribute::ArgumentList(ast::ArgumentListExtendedAttribute {
             arguments,
             name
-        }))
+        })
     }
 };
 
-ExtendedAttributeIdent: Box<ast::ExtendedAttribute> = {
+ExtendedAttributeIdent: ast::ExtendedAttribute = {
     <lhs: "Identifier"> "=" <rhs: Other> => {
-        Box::new(ast::ExtendedAttribute::Identifier(ast::IdentifierExtendedAttribute {
+        ast::ExtendedAttribute::Identifier(ast::IdentifierExtendedAttribute {
             lhs,
             rhs
-        }))
+        })
     }
 };
 
-ExtendedAttributeIdentList: Box<ast::ExtendedAttribute> = {
+ExtendedAttributeIdentList: ast::ExtendedAttribute = {
     <lhs: "Identifier"> "=" "(" <rhs: IdentifierList> ")" => {
-        Box::new(ast::ExtendedAttribute::IdentifierList(ast::IdentifierListExtendedAttribute {
+        ast::ExtendedAttribute::IdentifierList(ast::IdentifierListExtendedAttribute {
             lhs,
             rhs
-        }))
+        })
     }
 };
 
-ExtendedAttributeList: Vec<Box<ast::ExtendedAttribute>> = {
+ExtendedAttributeList: Vec<ast::ExtendedAttribute> = {
     ("[" <ExtendedAttribute> <ExtendedAttributes> "]")? => {
         match <> {
             Some((extended_attribute, extended_attributes)) => {
@@ -471,82 +471,82 @@ ExtendedAttributeList: Vec<Box<ast::ExtendedAttribute>> = {
     }
 };
 
-ExtendedAttributeNamedArgList: Box<ast::ExtendedAttribute> = {
+ExtendedAttributeNamedArgList: ast::ExtendedAttribute = {
     <lhs_name: "Identifier"> "=" <rhs_name: "Identifier">
     "(" <rhs_arguments: ArgumentList> ")" => {
-        Box::new(ast::ExtendedAttribute::NamedArgumentList(ast::NamedArgumentListExtendedAttribute {
+        ast::ExtendedAttribute::NamedArgumentList(ast::NamedArgumentListExtendedAttribute {
             lhs_name,
             rhs_name,
             rhs_arguments
-        }))
+        })
     }
 };
 
-ExtendedAttributeNoArgs: Box<ast::ExtendedAttribute> = {
-    Other => Box::new(ast::ExtendedAttribute::NoArguments(<>))
+ExtendedAttributeNoArgs: ast::ExtendedAttribute = {
+    Other => ast::ExtendedAttribute::NoArguments(<>)
 };
 
-// ExtendedAttributeOther: Box<ast::ExtendedAttribute> = {
+// ExtendedAttributeOther: ast::ExtendedAttribute = {
 //     "(" <inner: ExtendedAttributeInner?> ")" <rest: ExtendedAttribute?> => {
-//         Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
+//         ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
 //             group_type: ast::OtherExtendedAttributeGroupType::Parenthesis,
 //             inner: inner,
 //             rest: rest
-//         }))
+//         })
 //     },
 //     "[" <inner: ExtendedAttributeInner?> "]" <rest: ExtendedAttribute?> => {
-//         Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
+//         ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
 //             group_type: ast::OtherExtendedAttributeGroupType::Bracket,
 //             inner: inner,
 //             rest: rest
-//         }))
+//         })
 //     },
 //     "{" <inner: ExtendedAttributeInner?> "}" <rest: ExtendedAttribute?> => {
-//         Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
+//         ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
 //             group_type: ast::OtherExtendedAttributeGroupType::Brace,
 //             inner: inner,
 //             rest: rest
-//         }))
+//         })
 //     },
 //     <other: Other> <rest: ExtendedAttribute?> => {
-//         Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Other {
+//         ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Other {
 //             other: Some(other),
 //             rest: rest
-//         }))
+//         })
 //     }
 // };
 //
-// ExtendedAttributeOtherInner: Box<ast::ExtendedAttribute> = {
+// ExtendedAttributeOtherInner: ast::ExtendedAttribute = {
 //     "(" <inner: ExtendedAttributeInner?> ")" <rest: ExtendedAttributeInner?> => {
-//         Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
+//         ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
 //             group_type: ast::OtherExtendedAttributeGroupType::Parenthesis,
 //             inner: inner,
 //             rest: rest
-//         }))
+//         })
 //     },
 //     "[" <inner: ExtendedAttributeInner?> "]" <rest: ExtendedAttributeInner?> => {
-//         Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
+//         ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
 //             group_type: ast::OtherExtendedAttributeGroupType::Bracket,
 //             inner: inner,
 //             rest: rest
-//         }))
+//         })
 //     },
 //     "{" <inner: ExtendedAttributeInner?> "}" <rest: ExtendedAttributeInner?> => {
-//         Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
+//         ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Nested {
 //             group_type: ast::OtherExtendedAttributeGroupType::Brace,
 //             inner: inner,
 //             rest: rest
-//         }))
+//         })
 //     },
 //     <other: OtherOrComma> <rest: ExtendedAttributeInner?> => {
-//         Box::new(ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Other {
+//         ast::ExtendedAttribute::Other(ast::OtherExtendedAttribute::Other {
 //             other: other,
 //             rest: rest
-//         }))
+//         })
 //     }
 // };
 
-ExtendedAttributes: Vec<Box<ast::ExtendedAttribute>> = {
+ExtendedAttributes: Vec<ast::ExtendedAttribute> = {
     ("," <ExtendedAttribute> <ExtendedAttributes>)? => {
         match <> {
             Some((extended_attribute, extended_attributes)) => {
@@ -756,7 +756,7 @@ Iterable: ast::Iterable = {
     }
 };
 
-MaplikeRest: (Box<ast::Type>, Box<ast::Type>) = {
+MaplikeRest: (ast::Type, ast::Type) = {
     "maplike" "<" <key_type: TypeWithExtendedAttributes> ","
     <value_type: TypeWithExtendedAttributes> ">" ";" => {
         (key_type, value_type)
@@ -913,13 +913,13 @@ NamespaceMembers: Vec<ast::NamespaceMember> = {
     }
 };
 
-NonAnyType: Box<ast::Type> = {
+NonAnyType: ast::Type = {
     PromiseType => {
-        Box::new(ast::Type {
+        ast::Type {
             extended_attributes: vec![],
             nullable: false,
-            kind: ast::TypeKind::Promise(<>)
-        })
+            kind: ast::TypeKind::Promise(Box::new(<>))
+        }
     },
     <type_: PrimitiveType> <nullable: Null> => {
         let type_ = match type_ {
@@ -952,11 +952,11 @@ NonAnyType: Box<ast::Type> = {
             }
         };
 
-        Box::new(ast::Type {
+        ast::Type {
             extended_attributes: vec![],
             nullable,
             kind: type_
-        })
+        }
     },
     <type_: StringType> <nullable: Null> => {
         let type_ = match type_ {
@@ -965,46 +965,46 @@ NonAnyType: Box<ast::Type> = {
             ast::StringType::USVString => ast::TypeKind::USVString
         };
 
-        Box::new(ast::Type {
+        ast::Type {
             extended_attributes: vec![],
             nullable,
             kind: type_
-        })
+        }
     },
     <type_: "Identifier"> <nullable: Null> => {
-        Box::new(ast::Type {
+        ast::Type {
             extended_attributes: vec![],
             nullable: nullable,
             kind: ast::TypeKind::Identifier(type_)
-        })
+        }
     },
     "sequence" "<" <type_: TypeWithExtendedAttributes> ">" <nullable: Null> => {
-        Box::new(ast::Type {
+        ast::Type {
             extended_attributes: vec![],
             nullable,
-            kind: ast::TypeKind::Sequence(type_)
-        })
+            kind: ast::TypeKind::Sequence(Box::new(type_))
+        }
     },
     "object" <nullable: Null> => {
-        Box::new(ast::Type {
+        ast::Type {
             extended_attributes: vec![],
             nullable,
             kind: ast::TypeKind::Object
-        })
+        }
     },
     "symbol" <nullable: Null> => {
-        Box::new(ast::Type {
+        ast::Type {
             extended_attributes: vec![],
             nullable,
             kind: ast::TypeKind::Symbol
-        })
+        }
     },
     "Error" <nullable: Null> => {
-        Box::new(ast::Type {
+        ast::Type {
             extended_attributes: vec![],
             nullable,
             kind: ast::TypeKind::Error
-        })
+        }
     },
     <type_: BufferRelatedType> <nullable: Null> => {
         let type_ = match type_ {
@@ -1021,25 +1021,25 @@ NonAnyType: Box<ast::Type> = {
             ast::BufferRelatedType::Uint8ClampedArray => ast::TypeKind::Uint8ClampedArray
         };
 
-        Box::new(ast::Type {
+        ast::Type {
             extended_attributes: vec![],
             nullable,
             kind: type_
-        })
+        }
     },
     "FrozenArray" "<" <type_: TypeWithExtendedAttributes> ">" <nullable: Null> => {
-        Box::new(ast::Type {
+        ast::Type {
             extended_attributes: vec![],
             nullable,
-            kind: ast::TypeKind::FrozenArray(type_)
-        })
+            kind: ast::TypeKind::FrozenArray(Box::new(type_))
+        }
     },
     <type_: RecordType> <nullable: Null> => {
-        Box::new(ast::Type {
+        ast::Type {
             extended_attributes: vec![],
             nullable,
-            kind: ast::TypeKind::Record(type_.0, type_.1)
-        })
+            kind: ast::TypeKind::Record(type_.0, Box::new(type_.1))
+        }
     }
 };
 
@@ -1063,7 +1063,7 @@ OptionalIdentifier: Option<ast::Identifier> = {
     "Identifier"?
 };
 
-OptionalType: Option<Box<ast::Type>> = {
+OptionalType: Option<ast::Type> = {
     ("," <TypeWithExtendedAttributes>)?
 };
 
@@ -1271,15 +1271,15 @@ ReadWriteAttribute: ast::Attribute = {
     }
 };
 
-ReadWriteMaplike: (Box<ast::Type>, Box<ast::Type>) = {
+ReadWriteMaplike: (ast::Type, ast::Type) = {
     MaplikeRest
 };
 
-ReadWriteSetlike: Box<ast::Type> = {
+ReadWriteSetlike: ast::Type = {
     SetlikeRest
 };
 
-RecordType: (ast::StringType, Box<ast::Type>) = {
+RecordType: (ast::StringType, ast::Type) = {
     "record" "<" <key_type: StringType> "," <value_type: TypeWithExtendedAttributes> ">" => {
         (key_type, value_type)
     }
@@ -1296,18 +1296,18 @@ ReturnType: ast::ReturnType = {
     "void" => ast::ReturnType::Void
 };
 
-SetlikeRest: Box<ast::Type> = {
+SetlikeRest: ast::Type = {
     "setlike" "<" <TypeWithExtendedAttributes> ">" ";"
 };
 
-SingleType: Box<ast::Type> = {
+SingleType: ast::Type = {
     NonAnyType,
     "any" => {
-        Box::new(ast::Type {
+        ast::Type {
             extended_attributes: vec![],
             kind: ast::TypeKind::Any,
             nullable: false
-        })
+        }
     }
 };
 
@@ -1403,18 +1403,18 @@ StringifierRest: ast::Stringifier = {
     }
 };
 
-Type: Box<ast::Type> = {
+Type: ast::Type = {
     SingleType,
     <type_: UnionType> <nullable: Null> => {
-        Box::new(ast::Type {
+        ast::Type {
             extended_attributes: vec![],
             nullable,
             kind: ast::TypeKind::Union(type_)
-        })
+        }
     }
 };
 
-TypeWithExtendedAttributes: Box<ast::Type> = {
+TypeWithExtendedAttributes: ast::Type = {
     <extended_attributes: ExtendedAttributeList> <type_: Type> => {
         let mut type_ = type_;
         type_.extended_attributes = extended_attributes;
@@ -1432,22 +1432,22 @@ Typedef: ast::Typedef = {
     }
 };
 
-UnionMemberType: Box<ast::Type> = {
+UnionMemberType: ast::Type = {
     <extended_attributes: ExtendedAttributeList> <type_: NonAnyType> => {
         let mut type_ = type_;
         type_.extended_attributes = extended_attributes;
         type_
     },
     <type_: UnionType> <nullable: Null> => {
-        Box::new(ast::Type {
+        ast::Type {
             extended_attributes: vec![],
             kind: ast::TypeKind::Union(type_),
             nullable
-        })
+        }
     }
 };
 
-UnionMemberTypes: Vec<Box<ast::Type>> = {
+UnionMemberTypes: Vec<ast::Type> = {
     ("or" <UnionMemberType> <UnionMemberTypes>)? => {
         match <> {
             Some((member, members)) => {
@@ -1460,7 +1460,7 @@ UnionMemberTypes: Vec<Box<ast::Type>> = {
     }
 };
 
-UnionType: Vec<Box<ast::Type>> = {
+UnionType: Vec<ast::Type> = {
     "(" <first_member: UnionMemberType> "or"
     <second_member: UnionMemberType> <members: UnionMemberTypes> ")" => {
         let mut members = members;
