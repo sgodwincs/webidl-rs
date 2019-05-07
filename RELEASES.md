@@ -1,3 +1,8 @@
+# 0.9.0
+
+- Update `lalrpop` to `0.17.0`
+- Fix some new clippy warnings by removing useless `Box`ing
+
 # 0.8.0
 
  - Update `lalrpop` to `0.16.0` to reduce package size.
