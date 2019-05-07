@@ -19,7 +19,7 @@ lalrpop = "0.17"
 lalrpop-util = "0.17"
 
 [dev-dependencies]
-zip = "0.2.6"
+zip = "0.5"
 
 [features]
 default = []
