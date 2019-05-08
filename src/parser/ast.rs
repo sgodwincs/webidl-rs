@@ -65,11 +65,11 @@ pub enum UnsignedIntegerType {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Argument {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub default: Option<DefaultValue>,
     pub name: Identifier,
     pub optional: bool,
-    pub type_: Box<Type>,
+    pub type_: Type,
     pub variadic: bool,
 }
 
@@ -89,14 +89,14 @@ pub enum Attribute {
 #[derive(Clone, Debug, PartialEq)]
 pub struct Callback {
     pub arguments: Vec<Argument>,
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub name: Identifier,
     pub return_type: ReturnType,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct CallbackInterface {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub inherits: Option<Identifier>,
     pub members: Vec<InterfaceMember>,
     pub name: Identifier,
@@ -104,7 +104,7 @@ pub struct CallbackInterface {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Const {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub name: Identifier,
     pub nullable: bool,
     pub type_: ConstType,
@@ -168,15 +168,15 @@ pub enum Dictionary {
 #[derive(Clone, Debug, PartialEq)]
 pub struct DictionaryMember {
     pub default: Option<DefaultValue>,
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub name: Identifier,
     pub required: bool,
-    pub type_: Box<Type>,
+    pub type_: Type,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Enum {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub name: String,
     pub variants: Vec<String>,
 }
@@ -184,7 +184,7 @@ pub struct Enum {
 #[derive(Clone, Debug, PartialEq)]
 pub struct ExplicitStringifierOperation {
     pub arguments: Vec<Argument>,
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub name: Option<Identifier>,
     pub return_type: ReturnType,
 }
@@ -215,19 +215,19 @@ pub struct IdentifierListExtendedAttribute {
 /// compatibility of older WebIDLs.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Implements {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub implementer: Identifier,
     pub implementee: Identifier,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct ImplicitStringifierOperation {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Includes {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub includee: Identifier,
     pub includer: Identifier,
 }
@@ -251,17 +251,17 @@ pub enum InterfaceMember {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Iterable {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
-    pub key_type: Option<Box<Type>>,
-    pub value_type: Box<Type>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
+    pub key_type: Option<Type>,
+    pub value_type: Type,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Maplike {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
-    pub key_type: Box<Type>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
+    pub key_type: Type,
     pub read_only: bool,
-    pub value_type: Box<Type>,
+    pub value_type: Type,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -298,7 +298,7 @@ pub enum NamespaceMember {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct NonPartialDictionary {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub inherits: Option<Identifier>,
     pub members: Vec<DictionaryMember>,
     pub name: Identifier,
@@ -306,7 +306,7 @@ pub struct NonPartialDictionary {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct NonPartialInterface {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub inherits: Option<Identifier>,
     pub members: Vec<InterfaceMember>,
     pub name: Identifier,
@@ -314,14 +314,14 @@ pub struct NonPartialInterface {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct NonPartialMixin {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub members: Vec<MixinMember>,
     pub name: Identifier,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct NonPartialNamespace {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub members: Vec<NamespaceMember>,
     pub name: Identifier,
 }
@@ -417,12 +417,12 @@ pub enum Other {
 pub enum OtherExtendedAttribute {
     Nested {
         group_type: OtherExtendedAttributeGroupType,
-        inner: Option<Box<ExtendedAttribute>>,
-        rest: Option<Box<ExtendedAttribute>>,
+        inner: Option<ExtendedAttribute>,
+        rest: Option<ExtendedAttribute>,
     },
     Other {
         other: Option<Other>,
-        rest: Option<Box<ExtendedAttribute>>,
+        rest: Option<ExtendedAttribute>,
     },
 }
 
@@ -435,60 +435,60 @@ pub enum OtherExtendedAttributeGroupType {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct PartialDictionary {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub members: Vec<DictionaryMember>,
     pub name: Identifier,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct PartialInterface {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub members: Vec<InterfaceMember>,
     pub name: Identifier,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct PartialMixin {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub members: Vec<MixinMember>,
     pub name: Identifier,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct PartialNamespace {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub members: Vec<NamespaceMember>,
     pub name: Identifier,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct RegularAttribute {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub inherits: bool,
     pub name: Identifier,
     pub read_only: bool,
-    pub type_: Box<Type>,
+    pub type_: Type,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct RegularOperation {
     pub arguments: Vec<Argument>,
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub name: Option<Identifier>,
     pub return_type: ReturnType,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum ReturnType {
-    NonVoid(Box<Type>),
+    NonVoid(Type),
     Void,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Setlike {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub read_only: bool,
-    pub type_: Box<Type>,
+    pub type_: Type,
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
@@ -502,7 +502,7 @@ pub enum Special {
 #[derive(Clone, Debug, PartialEq)]
 pub struct SpecialOperation {
     pub arguments: Vec<Argument>,
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub name: Option<Identifier>,
     pub return_type: ReturnType,
     pub special_keywords: Vec<Special>,
@@ -510,16 +510,16 @@ pub struct SpecialOperation {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct StaticAttribute {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub name: Identifier,
     pub read_only: bool,
-    pub type_: Box<Type>,
+    pub type_: Type,
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct StaticOperation {
     pub arguments: Vec<Argument>,
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub name: Option<Identifier>,
     pub return_type: ReturnType,
 }
@@ -533,10 +533,10 @@ pub enum StringType {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct StringifierAttribute {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub name: Identifier,
     pub read_only: bool,
-    pub type_: Box<Type>,
+    pub type_: Type,
 }
 
 #[allow(variant_size_differences)]
@@ -548,7 +548,7 @@ pub enum StringifierOperation {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Type {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub kind: TypeKind,
     pub nullable: bool,
 }
@@ -572,7 +572,7 @@ pub enum TypeKind {
     Int8Array,
     Octet,
     Object,
-    Promise(ReturnType),
+    Promise(Box<ReturnType>),
     Record(StringType, Box<Type>),
     RestrictedDouble,
     RestrictedFloat,
@@ -586,7 +586,7 @@ pub enum TypeKind {
     Uint32Array,
     Uint8Array,
     Uint8ClampedArray,
-    Union(Vec<Box<Type>>),
+    Union(Vec<Type>),
     UnrestrictedDouble,
     UnrestrictedFloat,
     UnsignedLong,
@@ -596,9 +596,9 @@ pub enum TypeKind {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Typedef {
-    pub extended_attributes: Vec<Box<ExtendedAttribute>>,
+    pub extended_attributes: Vec<ExtendedAttribute>,
     pub name: Identifier,
-    pub type_: Box<Type>,
+    pub type_: Type,
 }
 
 /// Consumes a vector of ASTs that are flattened into a single AST. This is helpful if you want to
@@ -624,11 +624,11 @@ mod test {
         let ast2 = vec![Definition::Typedef(Typedef {
             extended_attributes: vec![],
             name: "Typedef".to_string(),
-            type_: Box::new(Type {
+            type_: Type {
                 extended_attributes: vec![],
                 kind: TypeKind::Any,
                 nullable: false,
-            }),
+            },
         })];
 
         assert_eq!(

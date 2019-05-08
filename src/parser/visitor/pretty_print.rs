@@ -13,19 +13,19 @@ use parser::ast::*;
 ///
 /// let ast = vec![Definition::Interface(Interface::NonPartial(NonPartialInterface {
 ///                 extended_attributes: vec![
-///                     Box::new(ExtendedAttribute::NoArguments(
-///                         Other::Identifier("Attribute".to_string())))],
+///                     ExtendedAttribute::NoArguments(
+///                         Other::Identifier("Attribute".to_string()))],
 ///                 inherits: None,
 ///                 members: vec![InterfaceMember::Attribute(Attribute::Regular(RegularAttribute {
 ///                              extended_attributes: vec![],
 ///                              inherits: false,
 ///                              name: "attr".to_string(),
 ///                              read_only: true,
-///                              type_: Box::new(Type {
+///                              type_: Type {
 ///                                  extended_attributes: vec![],
 ///                                  kind: TypeKind::SignedLong,
 ///                                  nullable: true
-///                              })
+///                              }
 ///                          }))],
 ///                 name: "Node".to_string()
 ///           }))];
@@ -64,7 +64,7 @@ impl PrettyPrintVisitor {
         self.output.push(')');
     }
 
-    fn stringify_extended_attributes(&mut self, extended_attributes: &[Box<ExtendedAttribute>]) {
+    fn stringify_extended_attributes(&mut self, extended_attributes: &[ExtendedAttribute]) {
         if extended_attributes.is_empty() {
             return;
         }
@@ -104,7 +104,7 @@ impl PrettyPrintVisitor {
     }
 
     #[allow(unknown_lints)]
-    #[allow(float_cmp)]
+    #[allow(clippy::float_cmp)]
     fn stringify_float_literal(&mut self, float_literal: f64) {
         if float_literal.is_nan() {
             self.output.push_str("NaN");

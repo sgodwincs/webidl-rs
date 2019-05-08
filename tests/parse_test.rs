@@ -30,9 +30,9 @@ fn parse_includes() {
     assert_eq!(
         ast,
         vec![Definition::Includes(Includes {
-            extended_attributes: vec![Box::new(ExtendedAttribute::NoArguments(Other::Identifier(
+            extended_attributes: vec![ExtendedAttribute::NoArguments(Other::Identifier(
                 "test".to_string(),
-            )))],
+            ))],
             includee: "B".to_string(),
             includer: "A".to_string(),
         })]
@@ -55,20 +55,20 @@ fn parse_mixin() {
     assert_eq!(
         ast,
         vec![Definition::Mixin(Mixin::Partial(PartialMixin {
-            extended_attributes: vec![Box::new(ExtendedAttribute::NoArguments(Other::Identifier(
+            extended_attributes: vec![ExtendedAttribute::NoArguments(Other::Identifier(
                 "test".to_string(),
-            )))],
+            ))],
             members: vec![MixinMember::Attribute(Attribute::Regular(
                 RegularAttribute {
                     extended_attributes: vec![],
                     inherits: false,
                     name: "entry".to_string(),
                     read_only: true,
-                    type_: Box::new(Type {
+                    type_: Type {
                         extended_attributes: vec![],
                         kind: TypeKind::UnsignedShort,
                         nullable: false,
-                    }),
+                    },
                 },
             ))],
             name: "Name".to_string(),

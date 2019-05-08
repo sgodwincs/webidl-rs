@@ -1,6 +1,12 @@
 language: rust
-cache: cargo
 rust:
-    - nightly
-    - beta
-    - stable
+  - stable
+  - beta
+  - nightly
+cache: cargo
+matrix:
+  include:
+  - rust: stable
+    name: "Clippy"
+    script:
+      - rustup component add clippy && cargo clippy
