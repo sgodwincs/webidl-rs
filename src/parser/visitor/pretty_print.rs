@@ -129,6 +129,10 @@ impl PrettyPrintVisitor {
 
             if let Some(next_member) = iterator.peek() {
                 match *member {
+                    InterfaceMember::Constructor(_) => match **next_member {
+                        InterfaceMember::Constructor(_) => (),
+                        _ => self.output.push('\n'),
+                    },
                     InterfaceMember::Attribute(_) => match **next_member {
                         InterfaceMember::Attribute(_) => (),
                         _ => self.output.push('\n'),
@@ -683,6 +687,7 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
             Other::ByteString => self.output.push_str("ByteString"),
             Other::Callback => self.output.push_str("callback"),
             Other::Const => self.output.push_str("const"),
+            Other::Constructor => self.output.push_str("constructor"),
             Other::DOMString => self.output.push_str("DOMString"),
             Other::DataView => self.output.push_str("DataView"),
             Other::Deleter => self.output.push_str("deleter"),

@@ -71,6 +71,7 @@ ArgumentNameKeyword: ast::Identifier = {
     "attribute" => "attribute".to_string(),
     "callback" => "callback".to_string(),
     "const" => "const".to_string(),
+    "constructor" => "constructor".to_string(),
     "deleter" => "deleter".to_string(),
     "dictionary" => "dictionary".to_string(),
     "enum" => "enum".to_string(),
@@ -210,6 +211,15 @@ ConstValue: ast::ConstValue = {
     "SignedIntegerLiteral" => ast::ConstValue::SignedIntegerLiteral(<>),
     "UnsignedIntegerLiteral" => ast::ConstValue::UnsignedIntegerLiteral(<>),
     "null" => ast::ConstValue::Null
+};
+
+Constructor: ast::Constructor = {
+    "constructor" "(" <arguments: ArgumentList> ")" ";" => {
+        ast::Constructor {
+            extended_attributes: vec![],
+            arguments
+        }
+    },
 };
 
 Default: Option<ast::DefaultValue> = {
@@ -634,6 +644,7 @@ InterfaceOrMixin: ast::Definition = {
 };
 
 InterfaceMember: ast::InterfaceMember = {
+    Constructor => ast::InterfaceMember::Constructor(<>),
     Const => ast::InterfaceMember::Const(<>),
     Operation => ast::InterfaceMember::Operation(<>),
     Stringifier => {
@@ -685,6 +696,9 @@ InterfaceMembers: Vec<ast::InterfaceMember> = {
                     }
                     ast::InterfaceMember::Const(ref mut const_) => {
                         const_.extended_attributes = extended_attributes;
+                    }
+                    ast::InterfaceMember::Constructor(ref mut constructor) => {
+                        constructor.extended_attributes = extended_attributes;
                     }
                     ast::InterfaceMember::Iterable(ref mut iterable) => {
                         iterable.extended_attributes = extended_attributes;
@@ -1082,6 +1096,7 @@ Other: ast::Other = {
     "ByteString" => ast::Other::ByteString,
     "callback" => ast::Other::Callback,
     "const" => ast::Other::Const,
+    "constructor" => ast::Other::Constructor,
     "DOMString" => ast::Other::DOMString,
     "DataView" => ast::Other::DataView,
     "deleter" => ast::Other::Deleter,
@@ -1500,6 +1515,7 @@ extern {
         "ByteString" => Token::ByteString,
         "callback" => Token::Callback,
         "const" => Token::Const,
+        "constructor" => Token::Constructor,
         "DataView" => Token::DataView,
         "deleter" => Token::Deleter,
         "dictionary" => Token::Dictionary,
