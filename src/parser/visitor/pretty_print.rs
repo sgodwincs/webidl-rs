@@ -342,6 +342,19 @@ impl<'ast> ImmutableVisitor<'ast> for PrettyPrintVisitor {
         }
     }
 
+    fn visit_constructor(&mut self, constructor: &'ast Constructor) {
+        if !constructor.extended_attributes.is_empty() {
+            self.output.push_str("    ");
+            self.stringify_extended_attributes(&constructor.extended_attributes);
+            self.output.push('\n');
+        }
+
+        self.output.push_str("    constructor");
+
+        self.stringify_arguments(&constructor.arguments);
+        self.output.push_str(";\n");
+    }
+
     fn visit_default_value(&mut self, default_value: &'ast DefaultValue) {
         match *default_value {
             DefaultValue::ConstValue(ref const_value) => self.visit_const_value(const_value),
