@@ -140,6 +140,12 @@ pub enum ConstValue {
 }
 
 #[derive(Clone, Debug, PartialEq)]
+pub struct Constructor {
+    pub extended_attributes: Vec<ExtendedAttribute>,
+    pub arguments: Vec<Argument>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
 pub enum DefaultValue {
     ConstValue(ConstValue),
     EmptySequence,
@@ -241,6 +247,7 @@ pub enum Interface {
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum InterfaceMember {
+    Constructor(Constructor),
     Attribute(Attribute),
     Const(Const),
     Iterable(Iterable),
@@ -344,6 +351,7 @@ pub enum Other {
     ByteString,
     Callback,
     Const,
+    Constructor,
     DOMString,
     DataView,
     Deleter,

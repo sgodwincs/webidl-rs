@@ -32,6 +32,10 @@ macro_rules! make_visitor {
                 self.walk_argument_list_extended_attribute(ex);
             }
 
+            fn visit_constructor(&mut self, constructor: &'ast $($mutability)* Constructor) {
+                self.walk_constructor(constructor);
+            }
+
             fn visit_attribute(&mut self, attribute: &'ast $($mutability)* Attribute) {
                 self.walk_attribute(attribute);
             }
@@ -302,6 +306,16 @@ macro_rules! make_visitor {
                 }
             }
 
+            fn walk_constructor(&mut self, constructor: &'ast $($mutability)* Constructor) {
+                for extended_attribute in &$($mutability)* constructor.extended_attributes {
+                    self.visit_extended_attribute(extended_attribute);
+                }
+
+                for argument in &$($mutability)* constructor.arguments {
+                    self.visit_argument(argument);
+                }
+            }
+
             fn walk_attribute(&mut self, attribute: &'ast $($mutability)* Attribute) {
                 match *attribute {
                     Attribute::Regular(ref $($mutability)* attribute) => {
@@ -541,6 +555,9 @@ macro_rules! make_visitor {
             fn walk_interface_member(&mut self,
                                      interface_member: &'ast $($mutability)* InterfaceMember) {
                 match *interface_member {
+                    InterfaceMember::Constructor(ref $($mutability)* member) => {
+                        self.visit_constructor(member);
+                    }
                     InterfaceMember::Attribute(ref $($mutability)* member) => {
                         self.visit_attribute(member);
                     }

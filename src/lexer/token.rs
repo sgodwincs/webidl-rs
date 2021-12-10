@@ -17,6 +17,7 @@ pub enum Token {
     ByteString,
     Callback,
     Const,
+    Constructor,
     DataView,
     Deleter,
     Dictionary,

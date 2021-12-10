@@ -50,7 +50,8 @@ fn parse_mixin() {
             partial interface mixin Name {
                 readonly attribute unsigned short entry;
             };",
-    ).unwrap();
+    )
+    .unwrap();
 
     assert_eq!(
         ast,
@@ -85,7 +86,8 @@ fn parse_integer_literals() {
              const unsigned long long max = 18446744073709551615;
              const long long min = -9223372036854775808;
          };",
-    ).unwrap();
+    )
+    .unwrap();
 
     assert_eq!(
         ast,
@@ -110,6 +112,46 @@ fn parse_integer_literals() {
                     }),
                 ],
                 name: "Name".to_string(),
+            },
+        ))]
+    );
+}
+
+// A test case using the "constructor" operation definition does not appear in the Mozilla WebIDLs, so it needs
+// to be tested separately.
+#[test]
+fn parse_constructor_operation() {
+    use ast::*;
+
+    let ast = parse_string(
+        "interface Foo {
+            constructor(double a);
+         };",
+    )
+    .unwrap();
+
+    assert_eq!(
+        ast,
+        vec![Definition::Interface(Interface::NonPartial(
+            NonPartialInterface {
+                extended_attributes: vec![],
+                inherits: None,
+                members: vec![InterfaceMember::Constructor(Constructor {
+                    extended_attributes: vec![],
+                    arguments: vec![Argument {
+                        extended_attributes: vec![],
+                        default: None,
+                        name: "a".to_string(),
+                        optional: false,
+                        type_: Type {
+                            extended_attributes: vec![],
+                            kind: TypeKind::RestrictedDouble,
+                            nullable: false,
+                        },
+                        variadic: false,
+                    }]
+                })],
+                name: "Foo".to_string(),
             },
         ))]
     );
