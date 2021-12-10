@@ -572,6 +572,7 @@ impl<'input> Lexer<'input> {
             "byte" => Token::Byte,
             "callback" => Token::Callback,
             "const" => Token::Const,
+            "constructor" => Token::Constructor,
             "deleter" => Token::Deleter,
             "dictionary" => Token::Dictionary,
             "double" => Token::Double,
@@ -610,11 +611,13 @@ impl<'input> Lexer<'input> {
             "unrestricted" => Token::Unrestricted,
             "unsigned" => Token::Unsigned,
             "void" => Token::Void,
-            _ => if identifier.starts_with('_') {
-                Token::Identifier(identifier.split_at(1).1.to_string())
-            } else {
-                Token::Identifier(identifier)
-            },
+            _ => {
+                if identifier.starts_with('_') {
+                    Token::Identifier(identifier.split_at(1).1.to_string())
+                } else {
+                    Token::Identifier(identifier)
+                }
+            }
         };
 
         Some(Ok((start, token, offset)))
