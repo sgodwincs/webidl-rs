@@ -229,7 +229,8 @@ Default: Option<ast::DefaultValue> = {
 DefaultValue: ast::DefaultValue = {
     ConstValue => ast::DefaultValue::ConstValue(<>),
     "StringLiteral" => ast::DefaultValue::StringLiteral(<>),
-    "[" "]" => ast::DefaultValue::EmptySequence
+    "[" "]" => ast::DefaultValue::EmptySequence,
+    "{" "}" => ast::DefaultValue::EmptySequence
 };
 
 Definition: ast::Definition = {
